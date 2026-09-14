@@ -1,0 +1,468 @@
+
+<title>Auditoría Tecnológica Segunda Etapa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Poppins:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F7F2EE; --surface:#FFFDFB; --ink:#2A1B10; --ink-2:#6B5A4E; --accent:#3B2611; --accent-soft:#E9DCCF;
+  --line:#E3D8CF; --good:#2E7D4F; --warn:#B7791F; --crit:#B3402F; --mark:#F3E4D3;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1E1613; --surface:#271D18; --ink:#F1E9E3; --ink-2:#C9BBAF; --accent:#D9B48F; --accent-soft:#3A2C24;
+    --line:#3A2C24; --good:#7BC49A; --warn:#E0B060; --crit:#E58A78; --mark:#3A2C24; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1E1613; --surface:#271D18; --ink:#F1E9E3; --ink-2:#C9BBAF; --accent:#D9B48F; --accent-soft:#3A2C24;
+  --line:#3A2C24; --good:#7BC49A; --warn:#E0B060; --crit:#E58A78; --mark:#3A2C24; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,"Segoe UI",system-ui,sans-serif;font-size:16px;line-height:1.7;
+     padding-block:40px 80px;padding-inline:clamp(16px,5vw,48px)}
+.doc{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:"Playfair Display",Georgia,serif;font-weight:600;line-height:1.2;text-wrap:balance;color:var(--ink)}
+h1{font-size:clamp(30px,4.5vw,42px);margin:0 0 8px}
+h1 + h2{font-family:Poppins,sans-serif;font-weight:500;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin:0 0 24px;border:0;padding:0}
+h2{font-size:clamp(22px,3vw,28px);margin:56px 0 16px;padding-top:24px;border-top:1px solid var(--line)}
+h3{font-size:19px;margin:36px 0 12px}
+p{margin:0 0 16px;max-width:70ch}
+ul,ol{max-width:70ch;padding-left:22px}
+li{margin-bottom:6px}
+strong{font-weight:600}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:var(--mark);padding:1px 6px;border-radius:4px}
+hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+.meta{color:var(--ink-2);font-size:14px;margin-bottom:8px}
+.tbl{overflow-x:auto;margin:20px 0 28px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.5;font-variant-numeric:tabular-nums}
+th,td{padding:11px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-weight:600;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);background:var(--accent-soft)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:500;white-space:nowrap}
+.tbl.compare td:first-child{white-space:normal;min-width:130px}
+.tbl.compare th:nth-child(4),.tbl.compare td:nth-child(4){background:var(--mark)}
+.tbl.compare td{min-width:200px}
+blockquote{margin:24px 0;padding:16px 20px;border-left:3px solid var(--accent);background:var(--surface);font-family:"Playfair Display",serif;font-size:19px;line-height:1.45}
+.verdict{margin:16px 0 8px;padding:14px 18px;border-left:3px solid var(--accent);background:var(--surface);max-width:70ch}
+.toc{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 40px;padding:0;list-style:none;font-size:14px}
+.toc a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line)}
+.toc a:hover,.toc a:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+a{color:var(--accent)}
+@media (max-width:600px){ th,td{padding:9px 10px} body{font-size:15px} }
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+<main class="doc"><h1 id="auditoria-tecnologica-y-arquitectura-final">Auditoría tecnológica y arquitectura final</h1>
+<h2 id="sistema-comercial-claudia-muller-segunda-etapa-laboral">Sistema Comercial · Claudia Müller · Segunda Etapa Laboral</h2>
+<p class="meta">Fecha: 13 de septiembre de 2026
+Estado: para decisión de Claudia antes de seguir construyendo</p><ul class="toc"><li><a href="#0-lo-primero-que-hice-y-que-no">0. Lo primero: qué hice y qué no</a></li><li><a href="#1-tu-situacion-en-una-frase">1. Tu situación en una frase</a></li><li><a href="#2-auditoria-herramienta-por-herramienta">2. Auditoría herramienta por herramienta</a></li><li><a href="#3-los-tres-escenarios">3. Los tres escenarios</a></li><li><a href="#4-lo-que-elegiria-si-fuera-mi-negocio">4. Lo que elegiría si fuera mi negocio</a></li><li><a href="#5-de-donde-sale-cada-dato-para-que-no-haya-cifras-inventadas">5. De dónde sale cada dato (para que no haya cifras inventadas)</a></li><li><a href="#6-plan-por-fases">6. Plan por fases</a></li><li><a href="#7-que-necesito-de-ti-para-continuar">7. Qué necesito de ti para continuar</a></li></ul>
+<hr />
+<h2 id="0-lo-primero-que-hice-y-que-no">0. Lo primero: qué hice y qué no</h2>
+<p>Tu instrucción llegó cuando ya había construido el núcleo de la aplicación (modelo de datos, motor de clasificación, scoring, pipeline, auditoría de duplicados/etiquetas, alertas). Paré ahí. No construí dashboard ni pantallas.</p>
+<p>Eso no fue trabajo perdido: el núcleo no depende de ninguna herramienta. ManyChat, Systeme.io o Hotmart entran como "adaptadores" (piezas pequeñas que traducen sus datos al formato de la app). Si mañana cambias una herramienta, se cambia el adaptador, no el sistema.</p>
+<p>Este documento responde a lo que pediste: auditoría herramienta por herramienta, tres escenarios, la tabla comparativa y mi elección como si fuera mi propio negocio. Al final tienes qué necesito de ti para continuar.</p>
+<hr />
+<h2 id="1-tu-situacion-en-una-frase">1. Tu situación en una frase</h2>
+<p>Tienes un motor de adquisición que funciona (1,65 M de visualizaciones en 30 días, 99,2 % de no seguidores, +5.155 seguidores) y un embudo que gotea justo después: 2.274 visitas al perfil, 19 clics en el enlace. Es decir: la gente te descubre en Reels, pero casi nadie pasa a un canal donde puedas hablarle. Lo que falta no es más alcance. Es un puente entre el Reel y una conversación registrada en una base de datos tuya.</p>
+<p>El sistema tiene que hacer una cosa bien: <strong>convertir cada interacción en un registro con origen, interés, intención y etapa, y avisarte cuando alguien está lista para hablar.</strong></p>
+<hr />
+<h2 id="2-auditoria-herramienta-por-herramienta">2. Auditoría herramienta por herramienta</h2>
+<p>Evalué cada pieza con tus diez criterios. Resumo la conclusión primero y el detalle después.</p>
+<h3 id="21-manychat-captura-en-instagram">2.1 ManyChat — captura en Instagram</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Criterio</th>
+<th>Evaluación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Función</td>
+<td>Convierte comentarios, respuestas a historias, menciones y palabras clave en conversaciones de DM automáticas. Es la única forma práctica de hacer "comenta FRONTERA y te escribo".</td>
+</tr>
+<tr>
+<td>¿La necesitas?</td>
+<td><strong>Sí, hoy.</strong> Es la pieza que convierte alcance en contacto. Sin ella, el Reel termina en un "like".</td>
+</tr>
+<tr>
+<td>¿Se integra?</td>
+<td>Sí. Puede empujar cada contacto a la app en tiempo real (External Request) y la app puede leer/escribir contactos vía API. Limitación real: su API <strong>no permite listar todos los contactos</strong>; por eso la app se alimenta de lo que ManyChat empuja, no de "descargas".</td>
+</tr>
+<tr>
+<td>¿Se puede reemplazar?</td>
+<td>Técnicamente sí, construyendo la captura dentro de la app con la API de mensajería de Instagram (Meta). Para tu propia cuenta no exige revisión de app, pero exige mantenimiento continuo, no tiene constructor visual y Meta cambia reglas con frecuencia.</td>
+</tr>
+<tr>
+<td>¿Hay alternativa mejor?</td>
+<td>No a tu tamaño. Chatfuel/Botpress no aportan nada nuevo y cuestan parecido. Construirlo propio tiene sentido cuando pases de ~5.000 contactos activos (ahí ManyChat sube a 69–99 USD/mes) o cuando quieras lógica que ManyChat no permite.</td>
+</tr>
+<tr>
+<td>Coste</td>
+<td>Pro ≈ 29–39 USD/mes hasta 2.500 contactos activos; Business ≈ 69–99 USD hasta 5.000–7.500; ≈ 199 USD en 15.000+. Lo que te pasó ("pagué 17, se bloqueó, pagué más") es exactamente su modelo: el plan Essential (250 contactos) se llena en una semana con tus Reels.</td>
+</tr>
+<tr>
+<td>Escalabilidad</td>
+<td>Escala, pero el precio crece con contactos activos, incluidos los que nunca respondieron. La app te dirá cuáles conviene archivar para no pagar por ruido.</td>
+</tr>
+<tr>
+<td>Limitaciones</td>
+<td>Sin exportación por API; etiquetas y campos crecen sin control si nadie manda; sus estadísticas de flujos no salen por API.</td>
+</tr>
+<tr>
+<td>Riesgo de dependencia</td>
+<td>Medio. Si se cae ManyChat, se cae la captura, pero tu base de datos ya está en la app. Nada se pierde.</td>
+</tr>
+<tr>
+<td>Mantenimiento</td>
+<td>Bajo si se usa como te propongo: pocos flujos, 6 campos CRM_*, cero etiquetas nuevas sin aprobación.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="verdict"><strong>Veredicto: se queda, pero degradada a "portero".</strong> Captura, hace la pregunta inteligente y empuja a la app. No decide nada, no segmenta, no nutre.</div>
+<h3 id="22-systemeio-email-paginas-cursos">2.2 Systeme.io — email, páginas, cursos</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Criterio</th>
+<th>Evaluación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Función</td>
+<td>Email marketing, secuencias, landing pages, checkout, cursos, todo en uno. Hoy lo usas para email/CRM tras la compra en Hotmart.</td>
+</tr>
+<tr>
+<td>¿La necesitas?</td>
+<td><strong>Para email, no a largo plazo. Para páginas/cursos, opcional.</strong> Tu nutrición debe depender de la segmentación (interés × intención) que vive en la app; un ESP externo solo puede reaccionar a etiquetas que la app le mande. Cada contacto pasa a existir en dos sitios, y eso es el desorden que quieres evitar.</td>
+</tr>
+<tr>
+<td>¿Se integra?</td>
+<td>Sí: tiene API (contactos, etiquetas) y disparadores por etiqueta. Suficiente para que la app lo gobierne mientras exista.</td>
+</tr>
+<tr>
+<td>¿Se puede reemplazar?</td>
+<td>Sí. Un motor de secuencias dentro de la app + un servicio de envío (Resend o Amazon SES) cubre email con trazabilidad total: cada apertura y clic suma al score del contacto.</td>
+</tr>
+<tr>
+<td>¿Hay alternativa mejor?</td>
+<td>Como ESP visual: Kit (ConvertKit) o MailerLite son mejores en automatizaciones y entregabilidad, pero son otra herramienta más. La mejor alternativa, en tu caso, es <strong>dentro de la app</strong>.</td>
+</tr>
+<tr>
+<td>Coste</td>
+<td>Gratis hasta 2.000 contactos, 17 USD hasta 5.000, 47 USD hasta 10.000. Con tu ritmo (+5.000 seguidores/mes) el escalón gratis dura poco si metes ahí a todo el mundo.</td>
+</tr>
+<tr>
+<td>Escalabilidad</td>
+<td>Correcta para email masivo; pobre para nutrición condicionada por comportamiento fino.</td>
+</tr>
+<tr>
+<td>Limitaciones</td>
+<td>Segmentación por etiquetas planas; la API no expone eventos de apertura/clic con detalle para atribuir.</td>
+</tr>
+<tr>
+<td>Riesgo de dependencia</td>
+<td>Bajo-medio: los contactos se exportan.</td>
+</tr>
+<tr>
+<td>Mantenimiento</td>
+<td>Bajo, pero es una interfaz más que abrir y mantener sincronizada.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="verdict"><strong>Veredicto: fase 1 se queda en plan gratis como buzón de email gobernado por la app (la app manda la etiqueta, Systeme dispara la secuencia). Fase 2 el email pasa a la app y Systeme.io se cancela</strong>, salvo que quieras conservar sus páginas o el audiocurso.</div>
+<h3 id="23-hotmart-cobro">2.3 Hotmart — cobro</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Criterio</th>
+<th>Evaluación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Función</td>
+<td>Checkout con medios de pago locales de Latinoamérica (PSE, OXXO, cuotas, moneda local), facturación e impuestos.</td>
+</tr>
+<tr>
+<td>¿La necesitas?</td>
+<td><strong>Sí.</strong> Tu compradora está en Colombia, México, Venezuela, Chile, Argentina. Un checkout con tarjeta internacional (Stripe/PayPal) pierde ventas ahí. Esto vale más que su comisión.</td>
+</tr>
+<tr>
+<td>¿Se integra?</td>
+<td>Sí: envía un aviso automático (webhook) por cada compra aprobada, reembolso o abandono de carrito. La app lo recibe y marca VENTA sola.</td>
+</tr>
+<tr>
+<td>¿Se puede reemplazar?</td>
+<td>Por Stripe solo si tu mercado principal fuera EE. UU./Europa. No es tu caso.</td>
+</tr>
+<tr>
+<td>Coste</td>
+<td>Comisión por venta (≈ 10 % + tarifa fija, varía por país). Sin cuota mensual.</td>
+</tr>
+<tr>
+<td>Riesgo / mantenimiento</td>
+<td>Bajo.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="verdict"><strong>Veredicto: se queda como único checkout.</strong> Se elimina el checkout de Systeme.io para no tener dos.</div>
+<h3 id="24-instagram-meta-graph-api-adquisicion-y-metricas">2.4 Instagram (Meta Graph API) — adquisición y métricas</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Criterio</th>
+<th>Evaluación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Función</td>
+<td>Es tu fuente de audiencia. Su API da, gratis, las métricas de cuenta y de cada Reel (visualizaciones, alcance, interacciones, seguidores ganados, demografía).</td>
+</tr>
+<tr>
+<td>¿La necesitas?</td>
+<td>Sí, para que la atribución Reel → contacto → venta no dependa de copiar números a mano.</td>
+</tr>
+<tr>
+<td>¿Se integra?</td>
+<td>Sí, con tu propia cuenta profesional vinculada a una página de Facebook y una app de Meta. Para tu propia cuenta no hace falta revisión de Meta.</td>
+</tr>
+<tr>
+<td>Coste</td>
+<td>0.</td>
+</tr>
+<tr>
+<td>Limitaciones</td>
+<td>Algunas métricas de Reels cambian de nombre con las versiones de la API; se mantiene.</td>
+</tr>
+<tr>
+<td>Riesgo</td>
+<td>Medio: Meta manda. Por eso la base de datos vive fuera de Meta.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="verdict"><strong>Veredicto: se conecta en fase 2.</strong> En fase 1 los números de Instagram se cargan a mano (una pantalla, cinco minutos al mes) y los Reels se registran con su nombre corto.</div>
+<h3 id="25-whatsapp-conversacion-de-cierre">2.5 WhatsApp — conversación de cierre</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Criterio</th>
+<th>Evaluación</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Función</td>
+<td>Donde se cierran ventas en Latinoamérica. Hoy no está en tu sistema.</td>
+</tr>
+<tr>
+<td>¿La necesitas?</td>
+<td>Sí, pero no necesitas tecnología nueva para empezar: WhatsApp Business (app del teléfono) + un enlace wa.me que ManyChat manda a las calientes. La app registra "pasó a WhatsApp".</td>
+</tr>
+<tr>
+<td>Alternativas</td>
+<td>WhatsApp Cloud API desde la app (fase 3) cuando quieras plantillas, respuestas automáticas y registro automático de la conversación. Meta cobra por conversación iniciada por ti; las respuestas dentro de 24 h no cuestan. ManyChat también lo ofrece, pero es una capa más sobre lo mismo.</td>
+</tr>
+<tr>
+<td>Coste</td>
+<td>0 ahora; después, centavos por conversación.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="verdict"><strong>Veredicto: fase 1 WhatsApp Business manual con registro en la app; fase 3 Cloud API dentro de la app.</strong></div>
+<h3 id="26-crm-externo-hubspot-pipedrive-notion-airtable">2.6 CRM externo (HubSpot, Pipedrive, Notion, Airtable)</h3>
+<p>Función: registro por persona, pipeline, tareas. <strong>No lo necesitas.</strong> Esa es exactamente la función que debe vivir en tu app, porque el CRM genérico no entiende "vino del Reel 'es muy caro', contestó MONETIZACIÓN, preguntó precio". Un CRM externo te obligaría a otra sincronización y otra interfaz. HubSpot gratis parece barato hasta que necesitas automatizaciones (≥ 800 USD/mes). Se elimina de la ecuación.</p>
+<h3 id="27-automatizadores-zapier-make-n8n">2.7 Automatizadores (Zapier, Make, n8n)</h3>
+<p>Función: conectar herramientas sin código. <strong>No los necesitas.</strong> La app recibe webhooks directamente de ManyChat y Hotmart, y llama a las API que haga falta. Zapier/Make añaden coste por operación (con 5.000 contactos/mes se vuelve caro), retrasos y un punto de fallo más. Se eliminan.</p>
+<h3 id="28-hojas-de-calculo-google-sheets">2.8 Hojas de cálculo (Google Sheets)</h3>
+<p>Hoy son tu base de datos accidental. <strong>Se eliminan como base de datos.</strong> La app exporta a CSV cuando quieras mirar algo en una hoja, pero la verdad vive en un solo sitio.</p>
+<h3 id="29-base-de-datos-y-hosting">2.9 Base de datos y hosting</h3>
+<p>La app necesita un lugar donde vivir encendida 24/7 (para recibir webhooks) y una base de datos. Opciones evaluadas: Railway (≈ 5–10 USD/mes, base de datos Postgres incluida, despliegue sencillo), Render (similar), Supabase (Postgres gestionado, gratis hasta 500 MB). Elijo <strong>Railway con Postgres</strong>: un solo proveedor, un solo panel, copias de seguridad automáticas, y la app arranca hoy con SQLite y pasa a Postgres sin cambiar código.</p>
+<h3 id="210-email-transaccionalenvio-resend-amazon-ses-postmark">2.10 Email transaccional/envío (Resend, Amazon SES, Postmark)</h3>
+<p>Para la fase 2 (email desde la app): <strong>Resend</strong> (gratis hasta 3.000 correos/mes; 20 USD hasta 50.000) con tu dominio autenticado (SPF/DKIM en el cPanel que ya tienes). Amazon SES es más barato a gran volumen (≈ 0,10 USD por 1.000) pero más incómodo de configurar. Se empieza con Resend.</p>
+<h3 id="211-inteligencia-artificial">2.11 Inteligencia artificial</h3>
+<p>Dos usos concretos, dentro de la app: (1) clasificar el texto libre de los DMs cuando las reglas por palabras no alcanzan ("no sé si esto es para mí, tengo 52 y una consulta de psicología…" → interés SEGUNDA_ETAPA, intención TIBIA, problema identificado); (2) redactar un borrador de respuesta con tu voz para que tú lo apruebes en un clic. Coste con la API de Claude: 5–15 USD/mes a tu volumen. Se activa en fase 2. El "AI Step" de ManyChat cuesta 29 USD/mes extra y decide dentro de ManyChat, fuera de tu base de datos: no.</p>
+<h3 id="212-meta-ads-publicos-personalizados-y-capi">2.12 Meta Ads: públicos personalizados y CAPI</h3>
+<p>Cuando pautes, la app puede enviar a Meta los eventos reales (lead calificado, sesión, venta) y las audiencias por temperatura (fría/tibia/caliente/cliente). ManyChat ya tiene CAPI y públicos de Instagram; usarlo en fase 1 es aceptable, pero en cuanto el pipeline vive en la app, los eventos salen de la app, que es donde está la verdad. Fase 3.</p>
+<h3 id="213-calendly-google-meet">2.13 Calendly / Google Meet</h3>
+<p>Se quedan (gratis, cumplen). Fase 2: Calendly avisa a la app cuando alguien agenda (webhook) y la etapa pasa a SESIÓN sola. Hasta entonces, lo marcas en un clic.</p>
+<hr />
+<h2 id="3-los-tres-escenarios">3. Los tres escenarios</h2>
+<h3 id="escenario-a-mantener-herramientas-actuales">ESCENARIO A — Mantener herramientas actuales</h3>
+<p>Instagram + ManyChat + Systeme.io + Hotmart + hojas de cálculo + tú como integradora.
+Qué pasa: los contactos entran en ManyChat, algunos en Systeme.io, los compradores en Hotmart; nadie sabe de qué Reel vino quién; el seguimiento depende de tu memoria. Escala el alcance, no el negocio. Es lo que tienes hoy.</p>
+<h3 id="escenario-b-optimizar-y-sustituir-algunas">ESCENARIO B — Optimizar y sustituir algunas</h3>
+<p>La app como cerebro (CRM, segmentación, scoring, pipeline, alertas, atribución, salud) + ManyChat solo como portero + Systeme.io en plan gratis gobernado por la app para email + Hotmart con webhook a la app + WhatsApp Business manual. Se eliminan hojas de cálculo, automatizadores y cualquier CRM externo.
+Qué pasa: una sola base de datos, todo trazable, alertas cuando alguien está caliente, tú intervienes solo en conversaciones. Se construye en días.</p>
+<h3 id="escenario-c-arquitectura-ideal-desde-cero">ESCENARIO C — Arquitectura ideal desde cero</h3>
+<p>La app absorbe además el email (secuencias por segmento + Resend), las métricas de Instagram por API, la clasificación con IA, WhatsApp por Cloud API y los eventos a Meta. ManyChat sigue de portero hasta que el volumen justifique captura propia. Herramientas externas: ManyChat, Hotmart, y proveedores invisibles (hosting, envío de email, Meta).
+Qué pasa: mínimo de herramientas, máxima automatización, todo el conocimiento del cliente en un activo tuyo. Se construye por fases sobre B.</p>
+<h3 id="tabla-comparativa">Tabla comparativa</h3>
+<div class="tbl compare"><table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Actual (A)</strong></th>
+<th><strong>Optimizada (B)</strong></th>
+<th><strong>Ideal (C)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Herramientas</strong></td>
+<td>Instagram, ManyChat, Systeme.io, Hotmart, hojas de cálculo, Calendly, Meet (+ tú)</td>
+<td>App (cerebro) + ManyChat (portero) + Systeme.io gratis (email) + Hotmart + Calendly/Meet</td>
+<td>App (cerebro, CRM, email, IA, WhatsApp, métricas) + ManyChat (portero) + Hotmart + Calendly/Meet. Proveedores invisibles: Railway, Resend, Meta</td>
+</tr>
+<tr>
+<td><strong>Coste mensual</strong></td>
+<td>≈ 40–60 USD (ManyChat según contactos + Systeme) + comisión Hotmart</td>
+<td>≈ 45–55 USD (ManyChat 29–39 + Railway 5–10 + Systeme 0) + comisión Hotmart</td>
+<td>≈ 60–95 USD (ManyChat 29–39 + Railway 10–20 + Resend 0–20 + IA 5–15) + comisión Hotmart. Systeme.io cancelado</td>
+</tr>
+<tr>
+<td><strong>Automatización</strong></td>
+<td>Solo dentro de ManyChat; el resto manual</td>
+<td>Captura → registro → clasificación → alerta automáticas; email por etiqueta</td>
+<td>Todo lo anterior + nutrición por segmento, venta registrada sola, IA que clasifica y redacta, WhatsApp registrado</td>
+</tr>
+<tr>
+<td><strong>Base de datos</strong></td>
+<td>Dispersa en 3 herramientas + hojas</td>
+<td>Una sola, tuya, en la app (Postgres)</td>
+<td>Una sola, tuya, con historial completo por persona</td>
+</tr>
+<tr>
+<td><strong>Email</strong></td>
+<td>Systeme.io, secuencia igual para todas</td>
+<td>Systeme.io gobernado por la app (etiqueta = interés × intención)</td>
+<td>Motor propio en la app: cada persona recibe lo que su interés e intención piden; aperturas y clics suman al score</td>
+</tr>
+<tr>
+<td><strong>Conversaciones</strong></td>
+<td>DM en ManyChat, sin registro fuera</td>
+<td>DM en ManyChat + WhatsApp manual; ambas registradas en la app con etapa y score</td>
+<td>Igual + WhatsApp por API con la conversación en la ficha y borradores con IA</td>
+</tr>
+<tr>
+<td><strong>Ventas</strong></td>
+<td>Hotmart, registradas a mano en otro sitio</td>
+<td>Hotmart avisa a la app → VENTA automática atribuida al Reel de origen</td>
+<td>Igual + eventos a Meta (CAPI) y audiencias por temperatura</td>
+</tr>
+<tr>
+<td><strong>Datos en tiempo real</strong></td>
+<td>No</td>
+<td>Sí (webhooks de ManyChat y Hotmart)</td>
+<td>Sí, incluidas métricas de Instagram por API</td>
+</tr>
+<tr>
+<td><strong>Trabajo manual</strong></td>
+<td>Alto: revisar, copiar, recordar</td>
+<td>Bajo: responder a quien la app te señala; cargar métricas de IG una vez al mes</td>
+<td>Mínimo: responder y vender</td>
+</tr>
+<tr>
+<td><strong>Escalabilidad</strong></td>
+<td>No escala: cada 1.000 contactos son más caos</td>
+<td>Escala hasta ~5.000 contactos activos sin cambiar nada</td>
+<td>Escala sin límite práctico; a partir de ~5.000–10.000 contactos se evalúa captura propia y ManyChat sale</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="4-lo-que-elegiria-si-fuera-mi-negocio">4. Lo que elegiría si fuera mi negocio</h2>
+<p><strong>Elijo C, construida por fases, y la fase 1 es exactamente B.</strong> No hay contradicción: la app es el centro en ambos, y cada fase quita una herramienta o un trabajo manual sin romper lo anterior.</p>
+<p>Por qué no me quedo en B: porque el email por etiquetas en Systeme.io repite el problema de raíz (dos bases, segmentación plana, sin atribución), y porque la clasificación con IA es lo que convierte un DM ambiguo en un dato útil sin que tú lo leas uno por uno.</p>
+<p>Por qué no salto directo a C completo: porque el 80 % del valor (saber quién vino de dónde, quién está caliente, con quién hablar hoy) está en la fase 1, se puede tener funcionando esta semana y ya cambia tu rutina. Lo demás se añade con datos reales, no con suposiciones.</p>
+<p>Por qué ManyChat se queda como portero y no lo construyo yo hoy: cuesta 29–39 USD/mes y hace bien una cosa que a mí me costaría semanas construir y meses mantener frente a los cambios de Meta. Cuando pases de 5.000 contactos activos (a tu ritmo, en pocos meses), el precio de ManyChat justifica la captura propia y la app ya estará lista para recibirla. Regla clara: <strong>ManyChat no decide, no segmenta, no nutre. Captura, pregunta y empuja.</strong></p>
+<h3 id="que-se-construye-dentro-de-la-app-porque-nadie-lo-hace-mejor-para-ti">Qué se construye dentro de la app (porque nadie lo hace mejor para ti)</h3>
+<p>Registro único por persona; origen automático (Reel, keyword, automatización); las 4 dimensiones (Origen, Interés, Intención, Etapa) con nomenclatura cerrada; scoring; pipeline; historial de cada cambio; alertas que solo avisan cuando hay que intervenir; "hoy habla con estas 5"; atribución Reel → contacto → lead → conversación → oportunidad → venta con los tres indicadores (Alcance, Conversación, Negocio); auditoría (duplicados, etiquetas, huecos) con DETECTAR → PROPONER → APROBAR → EJECUTAR; salud del sistema; reactivación; métricas de conversión y por país. Fase 2: secuencias de email, IA de clasificación y borradores, métricas de Instagram por API. Fase 3: WhatsApp Cloud API, CAPI y audiencias.</p>
+<h3 id="que-no-se-construye-porque-una-herramienta-lo-hace-mejor-y-mas-barato">Qué NO se construye (porque una herramienta lo hace mejor y más barato)</h3>
+<p>La captura de DMs en Instagram (ManyChat, por ahora); el cobro con medios locales (Hotmart); el envío físico de correos (Resend); la agenda (Calendly); el hosting (Railway).</p>
+<hr />
+<h2 id="5-de-donde-sale-cada-dato-para-que-no-haya-cifras-inventadas">5. De dónde sale cada dato (para que no haya cifras inventadas)</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Dato</th>
+<th>Fuente</th>
+<th>Cómo llega</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Visualizaciones, alcance, seguidores, demografía, países, visitas al perfil, clics en enlace</td>
+<td>Instagram</td>
+<td>Fase 1: pantalla de carga mensual (los de tus últimos 30 días ya quedan cargados como línea base). Fase 2: API de Meta, automático</td>
+</tr>
+<tr>
+<td>Métricas por Reel (views, interacciones, seguidores ganados)</td>
+<td>Instagram</td>
+<td>Igual que arriba, por Reel</td>
+</tr>
+<tr>
+<td>Contacto: ID, usuario de IG, nombre, email, teléfono, estado, última interacción, etiquetas, campos, último mensaje, si te sigue</td>
+<td>ManyChat</td>
+<td>Automático: External Request al webhook de la app en cada entrada, respuesta y clic; refresco por API</td>
+</tr>
+<tr>
+<td>Origen (Reel, keyword, CTA, automatización, campaña)</td>
+<td>ManyChat, escrito por el flujo</td>
+<td>Automático: 6 campos CRM_* que cada flujo rellena. El Reel se identifica por un nombre corto (ej. <code>reel-es-muy-caro</code>)</td>
+</tr>
+<tr>
+<td>Respuesta a la pregunta inteligente</td>
+<td>ManyChat (quick replies)</td>
+<td>Automático</td>
+</tr>
+<tr>
+<td>Interés, intención, score, etapa, temperatura</td>
+<td>La app</td>
+<td>Calculado. Se escribe de vuelta en ManyChat (4 campos) para que los flujos condicionen</td>
+</tr>
+<tr>
+<td>Estadísticas por automatización (entradas, respuestas, abandonos)</td>
+<td>La app</td>
+<td>Contadas a partir de lo que ManyChat empuja (su API no las expone)</td>
+</tr>
+<tr>
+<td>Conversaciones (quién escribió, quién espera respuesta)</td>
+<td>ManyChat → app</td>
+<td>Automático el mensaje entrante; "respondí" lo marcas tú en un clic (fase 3 automático por WhatsApp API)</td>
+</tr>
+<tr>
+<td>Sesión agendada</td>
+<td>Calendly</td>
+<td>Fase 1 un clic; fase 2 webhook</td>
+</tr>
+<tr>
+<td>Venta, importe, producto, país</td>
+<td>Hotmart</td>
+<td>Automático por webhook de compra aprobada</td>
+</tr>
+<tr>
+<td>Lo que todavía no llegó</td>
+<td>—</td>
+<td>Se muestra como <code>PENDIENTE_DE_SINCRONIZACION</code>, nunca como cero ni como estimación</td>
+</tr>
+</tbody>
+</table></div>
+<p>Qué necesita intervención humana (y solo esto): responder a las personas que la app señala; marcar "respondí", "sesión" y "venta manual" cuando no venga de Hotmart; aprobar propuestas de limpieza; cargar las métricas de Instagram una vez al mes hasta la fase 2.</p>
+<hr />
+<h2 id="6-plan-por-fases">6. Plan por fases</h2>
+<p><strong>Fase 1 (esta semana) — Escenario B funcionando.</strong> App desplegada en Railway; ManyChat con los 6 campos CRM_* y el External Request en los flujos de entrada; Hotmart con webhook; línea base de Instagram cargada; dashboard, pipeline, alertas, salud, propuestas. Tú empiezas a trabajar desde "Acciones de hoy".</p>
+<p><strong>Fase 2 (2–4 semanas después, con datos reales).</strong> Email dentro de la app con Resend; Systeme.io se cancela; IA para clasificar DMs y redactar borradores; métricas de Instagram por API; Calendly por webhook.</p>
+<p><strong>Fase 3 (cuando el volumen lo pida).</strong> WhatsApp Cloud API con conversación en la ficha; eventos a Meta (CAPI) y audiencias por temperatura; evaluación de captura propia para sustituir ManyChat.</p>
+<hr />
+<h2 id="7-que-necesito-de-ti-para-continuar">7. Qué necesito de ti para continuar</h2>
+<ol>
+<li><strong>Tu decisión</strong>: C por fases (mi recomendación), B a secas, o A.</li>
+<li><strong>Clave de API de ManyChat</strong> (Settings → API). Solo la pegas en la configuración de la app; no me la mandes por chat.</li>
+<li><strong>Cuenta en Railway</strong> (railway.app, con tu Google). Te guío paso a paso o lo hacemos juntas desde tu navegador. Coste ≈ 5 USD/mes.</li>
+<li><strong>Acceso a Hotmart → Herramientas → Webhook</strong> para pegar la URL de la app (lo hacemos después de desplegar).</li>
+<li><strong>Lista de tus Reels activos con CTA</strong> (nombre corto y keyword). Con eso dejo creados los "orígenes" para que la atribución funcione desde el primer contacto.</li>
+</ol>
+<p>Con el punto 1 sigo construyendo de inmediato. Con el 2 y el 3, el sistema queda vivo.</p></main>

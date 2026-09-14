@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% from "macros.html" import val, tile, chip, persona %}
+{% block badge %}{% if sync_ok %}<span class="dot ok"></span>ManyChat sincronizando{% elif mc_configurado %}<span class="dot warn"></span>Esperando el primer contacto de ManyChat{% else %}<span class="dot crit"></span>ManyChat sin conectar · <a href="/configuracion">configurar</a>{% endif %}{% endblock %}
+{% block content %}
+{% if request.query_params.get('msg') == 'prueba' %}<div class="msg">Contacto de prueba creado. Míralo en Acciones y en Alertas; entra en su ficha y pulsa «Ya le respondí» para ver el historial. Se borra desde Configuración.</div>{% endif %}
+<div class="head">
+  <div><h1>Panel</h1><div class="sub">Qué está pasando · por qué · a quién atender · qué contenido lo produjo · qué hacer ahora</div></div>
+  <details class="block" style="padding:10px 14px;max-width:520px"><summary>¿Para qué es esta app? (recordatorio)</summary>
+    <p style="margin:8px 0 0;font-size:14px">Instagram trae gente. ManyChat la recibe y la manda aquí. <b>Esta app es tu memoria comercial</b>: guarda a cada persona con de qué Reel vino, qué le interesa y qué tan cerca está de comprar, y te dice cada día con quién hablar. Tú solo haces dos cosas: <b>responder a quien te señala</b> y marcar «Ya le respondí». Lo demás (registrar, clasificar, recordar, medir) lo hace sola.</p>
+  </details>
+</div>
+
+<div class="grid g2">
+  <section class="block">
+    <h2>Acciones <span class="sub">Claudia, hoy habla con estas personas</span></h2>
+    {% if acciones %}
+    <ul class="list">
+      {% for a in acciones %}
+      <li>
+        <span class="chip {{ a.contact.intencion }}">{{ a.contact.intencion }}</span>
+        <div><div class="who">{{ persona(a.contact) }}</div>
+          <div class="why">{{ a.motivo }}{% if a.contact.origen_content %} · viene de «{{ a.contact.origen_content.title }}»{% endif %}{% if a.contact.mc_last_input_text %} · «{{ a.contact.mc_last_input_text[:90] }}»{% endif %}</div></div>
+        <span class="muted">score {{ a.contact.score }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty">Nadie pendiente ahora mismo. {% if not sync_ok %}Esta lista se llena sola cuando ManyChat empiece a enviar contactos.{% endif %}</p>{% endif %}
+  </section>
+
+  <section class="block">
+    <h2>Alertas <span class="sub"><a href="/alertas">ver todas</a></span></h2>
+    {% if alertas %}
+    <div class="grid" style="gap:8px">
+      {% for a in alertas %}
+      <div class="alert {{ a.level }}">
+        <div class="t">{% if a.contact %}<a href="/contactos/{{ a.contact.id }}">{{ a.title }}</a>{% else %}{{ a.title }}{% endif %} <span class="muted" style="font-weight:400;font-size:12px">· {{ a.created_at|dt }}</span></div>
+        {% if a.recommendation %}<div class="r">→ {{ a.recommendation }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}<p class="empty">Sin alertas abiertas. Solo avisa cuando hace falta intervenir.</p>{% endif %}
+  </section>
+</div>
+
+<div class="section grid g2">
+  <section class="block">
+    <h2>Hoy</h2>
+    <div class="tiles">
+      {{ tile('Contactos nuevos', resumen.hoy.contactos_nuevos if sync_ok else PENDIENTE) }}
+      {{ tile('Conversaciones nuevas', resumen.hoy.conversaciones if sync_ok else PENDIENTE) }}
+      {{ tile('Leads calientes', resumen.hoy.calientes if sync_ok else PENDIENTE) }}
+      {{ tile('Oportunidades', resumen.hoy.oportunidades if sync_ok else PENDIENTE) }}
+      {{ tile('Ventas', resumen.hoy.ventas) }}
+    </div>
+  </section>
+  <section class="block">
+    <h2>Esta semana</h2>
+    <div class="tiles">
+      {{ tile('Nuevos leads', resumen.semana.leads if sync_ok else PENDIENTE) }}
+      {{ tile('Conversaciones', resumen.semana.conversaciones if sync_ok else PENDIENTE) }}
+      {{ tile('Oportunidades', resumen.semana.oportunidades if sync_ok else PENDIENTE) }}
+      {{ tile('Ventas', resumen.semana.ventas, ('USD ' ~ resumen.semana.ingresos) if resumen.semana.ingresos else None) }}
+      {{ tile('Tasa lead → venta', (resumen.semana.tasa_conversion ~ ' %') if sync_ok else PENDIENTE) }}
+    </div>
+  </section>
+</div>
+
+<section class="section block">
+  <h2>Embudo <span class="sub">de la visualización a la venta, cada etapa por separado</span></h2>
+  {% set maxv = namespace(v=1) %}
+  {% for e in embudo %}{% if e.valor is number and e.valor > maxv.v %}{% set maxv.v = e.valor %}{% endif %}{% endfor %}
+  <div class="funnel">
+    {% for e in embudo %}
+    <div class="row">
+      <div>{{ e.nombre }} <span class="muted" style="font-size:11px">{{ e.fuente }}</span></div>
+      <div>{% if e.valor is number %}<div class="bar" style="width:{{ [100 * (e.valor / maxv.v) ** 0.35, 1.5]|max if e.valor > 0 else 0.5 }}%"></div>{% endif %}</div>
+      <div class="v">{{ val(e.valor) }}</div>
+      <div class="t">{% if e.tasa is not none %}{{ e.tasa|num }} %{% endif %}</div>
+    </div>
+    {% endfor %}
+  </div>
+  <p class="sub" style="margin:10px 0 0">La barra usa escala comprimida para que las etapas pequeñas sigan siendo visibles; el número manda.</p>
+</section>
+
+<div class="section grid g2">
+  <section class="block">
+    <h2>Instagram <span class="sub">{% if snap %}{{ snap.period_start.strftime('%d/%m') }} – {{ snap.period_end.strftime('%d/%m/%Y') }}{% endif %}</span></h2>
+    {% if snap %}
+    <div class="tiles">
+      {{ tile('Visualizaciones', snap.views) }}
+      {{ tile('No seguidores', (snap.non_follower_pct|num ~ ' %')) }}
+      {{ tile('Seguidores', (snap.follower_pct|num ~ ' %')) }}
+      {{ tile('Nuevos seguidores', '+' ~ (snap.net_followers|num)) }}
+      {{ tile('Visitas al perfil', snap.profile_visits) }}
+      {{ tile('Clicks en enlace', snap.link_clicks) }}
+      {{ tile('Reels · vistas', snap.views_by_type.REEL) }}
+      {{ tile('Reels · interacciones', snap.interactions_by_type.REEL) }}
+    </div>
+    {% if snap.ages %}<p class="sub" style="margin-top:10px">Audiencia: {% for g, v in snap.gender.items() %}{{ g }} {{ v|num }} %{{ ' · ' if not loop.last }}{% endfor %} · edades {% for a, v in snap.ages.items() if v >= 9 %}{{ a }}: {{ v|num }} %{{ ' · ' if not loop.last }}{% endfor %} · países {% for p, v in snap.countries.items() %}{{ p }} {{ v|num }} %{{ ' · ' if not loop.last }}{% endfor %}</p>{% endif %}
+    {% else %}<p class="empty">Sin datos de Instagram. Cárgalos en <a href="/configuracion">Configuración</a>.</p>{% endif %}
+    {% if reels_hot %}<div class="alert media" style="margin-top:10px">{% for r in reels_hot %}<div class="t">📈 «{{ r.content.title }}» generó {{ r.contactos_24h }} contactos en 24 h (promedio {{ r.promedio }})</div>{% endfor %}</div>{% endif %}
+  </section>
+
+  <section class="block">
+    <h2>ManyChat <span class="sub">{% if mc.ultima_sync %}última sincronización {{ mc.ultima_sync|dt }}{% endif %}</span></h2>
+    <div class="tiles">
+      {{ tile('Contactos', mc.total) }}
+      {{ tile('Nuevos (7 d)', mc.nuevos_7d) }}
+      {{ tile('Conversaciones abiertas', mc.conversaciones_abiertas) }}
+      {{ tile('Respuestas', mc.respuestas) }}
+      {{ tile('Leads calificados', mc.leads_calificados) }}
+      {{ tile('Leads listos para oferta', mc.leads_listos_oferta) }}
+    </div>
+    {% if not mc.sincronizado %}<p class="sub" style="margin-top:10px">Estos números llegan solos cuando ManyChat empiece a enviar contactos al webhook. No se estiman ni se inventan.</p>{% endif %}
+  </section>
+</div>
+
+<section class="section block">
+  <h2>Pipeline</h2>
+  <div class="pipe">
+    {% for e in ETAPAS %}<div class="st"><div class="k">{{ e.replace('_',' / ') }}</div><div class="v">{{ pipeline[e] if sync_ok or pipeline[e] else '·' }}</div></div>{% endfor %}
+  </div>
+  <p class="sub" style="margin-top:10px">Conversión: lead → conversación {{ val(conversion.lead_conversacion) }}{% if conversion.lead_conversacion is number %} %{% endif %} · conversación → sesión {{ val(conversion.conversacion_sesion) }}{% if conversion.conversacion_sesion is number %} %{% endif %} · sesión/oferta → venta {{ val(conversion.oferta_venta) }}{% if conversion.oferta_venta is number %} %{% endif %}</p>
+</section>
+
+<div class="section grid g2">
+  <section class="block">
+    <h2>Contenido ganador <span class="sub"><a href="/contenido">valor comercial por Reel</a></span></h2>
+    <div class="tbl"><table>
+      <tr><th>Reel</th><th class="num">Alcance</th><th class="num">Conversación</th><th class="num">Negocio</th><th>Veredicto</th></tr>
+      {% for f in contenido %}
+      <tr><td>{{ f.title }}</td><td class="num">{{ val(f.views) }}</td><td class="num">{{ f.contactos if sync_ok else val(PENDIENTE, true) }}</td><td class="num">{{ f.negocio if sync_ok else val(PENDIENTE, true) }}</td><td>{{ f.veredicto if sync_ok else '—' }}</td></tr>
+      {% endfor %}
+    </table></div>
+  </section>
+  <section class="block">
+    <h2>Salud del sistema <span class="sub"><a href="/salud">detalle</a></span></h2>
+    <div class="health">
+      <div class="h"><span>Contactos correctamente clasificados</span><b>{% if salud.clasificados_pct is not none %}{{ salud.clasificados_pct|num }} %{% else %}—{% endif %}</b></div>
+      <div class="h"><span>Contactos sin origen</span><b>{{ salud.sin_origen }}</b></div>
+      <div class="h"><span>Contactos sin etapa</span><b>{{ salud.sin_etapa }}</b></div>
+      <div class="h"><span>Duplicados</span><b>{{ salud.duplicados }}</b></div>
+      <div class="h"><span>Etiquetas obsoletas</span><b>{{ salud.etiquetas_obsoletas }}</b></div>
+      <div class="h"><span>Leads sin seguimiento</span><b>{{ salud.leads_sin_seguimiento }}</b></div>
+      <div class="h"><span>Conversaciones pendientes</span><b>{{ salud.conversaciones_pendientes }}</b></div>
+      <div class="h"><span>Pendientes de sincronización</span><b>{{ salud.pendientes_de_sincronizacion }}</b></div>
+    </div>
+  </section>
+</div>
+{% endblock %}

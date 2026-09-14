@@ -1,0 +1,17 @@
+{% macro val(v, short=False) -%}
+{%- if v == PENDIENTE -%}<span class="pend" title="Este dato llega solo cuando ManyChat empieza a enviar contactos">{{ "PENDIENTE" if short else "PENDIENTE DE SINCRONIZACIÓN" }}</span>
+{%- elif v is none -%}<span class="muted">—</span>
+{%- else -%}{{ v|num }}{%- endif -%}
+{%- endmacro %}
+
+{% macro tile(k, v, n=None) -%}
+<div class="tile"><div class="k">{{ k }}</div><div class="v {{ 'small' if v == PENDIENTE }}">{{ val(v) }}</div>{% if n %}<div class="n">{{ n }}</div>{% endif %}</div>
+{%- endmacro %}
+
+{% macro chip(v) -%}
+{% if v %}<span class="chip {{ v }}">{{ v.replace('_',' ') }}</span>{% else %}<span class="muted">—</span>{% endif %}
+{%- endmacro %}
+
+{% macro persona(c) -%}
+<a href="/contactos/{{ c.id }}">{{ c.display }}</a>{% if c.name and c.ig_username %} <span class="muted">{{ c.name }}</span>{% endif %}
+{%- endmacro %}

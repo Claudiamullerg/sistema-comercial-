@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="head"><div><h1>Propuestas de limpieza</h1><div class="sub">Detectar → proponer → mostrar → aprobar → ejecutar. Nada se borra sin tu aprobación.</div></div></div>
+{% if rows %}
+<div class="tbl block" style="padding:0"><table>
+  <tr><th>Estado</th><th>Propuesta</th><th>Detalle</th><th>Resultado</th><th></th></tr>
+  {% for p in rows %}
+  <tr>
+    <td><span class="chip {{ 'CLIENTE' if p.status == 'ejecutada' else ('TIBIA' if p.status == 'aprobada' else ('NO_INTERESADO' if p.status == 'rechazada' else '')) }}">{{ p.status }}</span></td>
+    <td><b>{{ p.title }}</b><br><span class="muted" style="font-size:12px">{{ p.type }} · {{ p.created_at|dt }}</span>
+      {% if p.type == 'FUSIONAR_DUPLICADOS' %}<br><span class="muted" style="font-size:12px">principal #{{ p.payload.principal }} · duplicados {% for d in p.payload.duplicados %}<a href="/contactos/{{ d }}">#{{ d }}</a> {% endfor %}</span>{% endif %}</td>
+    <td style="max-width:360px">{{ p.detail }}</td>
+    <td>{{ p.result or '' }}</td>
+    <td><div class="actions">
+      {% if p.status == 'propuesta' %}<form method="post" action="/propuestas/{{ p.id }}/aprobar"><button class="small">Aprobar</button></form><form method="post" action="/propuestas/{{ p.id }}/rechazar"><button class="small sec">Rechazar</button></form>
+      {% elif p.status == 'aprobada' %}<form method="post" action="/propuestas/{{ p.id }}/ejecutar"><button class="small">Ejecutar ahora</button></form>{% endif %}
+    </div></td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}<div class="block"><p class="empty">No hay propuestas. Se generan solas cuando la auditoría detecta duplicados o etiquetas sin uso.</p></div>{% endif %}
+{% endblock %}

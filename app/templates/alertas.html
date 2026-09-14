@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="head"><div><h1>Alertas</h1><div class="sub">Solo las que requieren intervención humana</div></div>
+  <div class="actions">{% if todas %}<a class="btn sec small" href="/alertas">Solo abiertas</a>{% else %}<a class="btn sec small" href="/alertas?todas=1">Ver historial</a>{% endif %}</div></div>
+{% if rows %}
+<div class="grid" style="gap:8px">
+  {% for a in rows %}
+  <div class="alert {{ a.level }}">
+    <div class="t">{% if a.contact %}<a href="/contactos/{{ a.contact.id }}">{{ a.title }}</a>{% else %}{{ a.title }}{% endif %} <span class="muted" style="font-weight:400;font-size:12px">· {{ a.status }} · {{ a.created_at|dt }}</span></div>
+    {% if a.body %}<div class="b">{{ a.body }}</div>{% endif %}
+    {% if a.recommendation %}<div class="r">→ {{ a.recommendation }}</div>{% endif %}
+    {% if a.status == 'abierta' %}
+    <div class="actions" style="margin-top:8px">
+      <form method="post" action="/alertas/{{ a.id }}/resolver"><input type="hidden" name="next" value="/alertas"><button class="small">Resuelta</button></form>
+      <form method="post" action="/alertas/{{ a.id }}/descartar"><input type="hidden" name="next" value="/alertas"><button class="small sec">Descartar</button></form>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}<div class="block"><p class="empty">Sin alertas.</p></div>{% endif %}
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% from "macros.html" import chip, persona %}
+{% block content %}
+<div class="head"><div><h1>Salud del sistema</h1><div class="sub">El sistema impide que el desorden vuelva a crecer</div></div>
+  <div class="actions"><form method="post" action="/salud/auditar"><button class="sec small">Auditar ahora</button></form>{% if propuestas_abiertas %}<a class="btn small" href="/propuestas">{{ propuestas_abiertas }} propuestas por revisar</a>{% endif %}</div></div>
+
+<div class="health">
+  <div class="h"><span>Contactos correctamente clasificados</span><b>{% if s.clasificados_pct is not none %}{{ s.clasificados_pct|num }} %{% else %}—{% endif %}</b></div>
+  <div class="h"><span>Contactos sin origen</span><b class="{{ 'crit' if s.sin_origen }}">{{ s.sin_origen }}</b></div>
+  <div class="h"><span>Contactos sin etapa</span><b class="{{ 'crit' if s.sin_etapa }}">{{ s.sin_etapa }}</b></div>
+  <div class="h"><span>Leads sin segmentar (sin interés)</span><b class="{{ 'warn' if s.sin_segmentacion }}">{{ s.sin_segmentacion }}</b></div>
+  <div class="h"><span>Duplicados</span><b class="{{ 'warn' if s.duplicados }}">{{ s.duplicados }}</b></div>
+  <div class="h"><span>Etiquetas obsoletas / sin uso / duplicadas</span><b class="{{ 'warn' if s.etiquetas_obsoletas }}">{{ s.etiquetas_obsoletas }}</b></div>
+  <div class="h"><span>Contactos con demasiadas etiquetas</span><b>{{ s.contactos_con_demasiadas_etiquetas }}</b></div>
+  <div class="h"><span>Leads sin seguimiento</span><b class="{{ 'crit' if s.leads_sin_seguimiento }}">{{ s.leads_sin_seguimiento }}</b></div>
+  <div class="h"><span>Conversaciones pendientes</span><b class="{{ 'crit' if s.conversaciones_pendientes }}">{{ s.conversaciones_pendientes }}</b></div>
+  <div class="h"><span>Conversaciones abandonadas</span><b class="{{ 'warn' if s.conversaciones_abandonadas }}">{{ s.conversaciones_abandonadas }}</b></div>
+  <div class="h"><span>Automatizaciones con problemas</span><b class="{{ 'warn' if s.automatizaciones_con_problemas }}">{{ s.automatizaciones_con_problemas }}</b></div>
+  <div class="h"><span>Pendientes de sincronización</span><b>{{ s.pendientes_de_sincronizacion }}</b></div>
+</div>
+
+<div class="section grid g2">
+  <section class="block"><h2>Conversaciones que esperan respuesta</h2>
+    {% if pendientes %}<ul class="list">{% for c in pendientes %}<li><span class="chip {{ c.intencion }}">{{ c.intencion }}</span><div><div class="who">{{ persona(c) }}</div><div class="why">«{{ (c.mc_last_input_text or '')[:100] }}» · {{ (c.last_inbound_at or c.updated_at)|dt }}</div></div><span class="muted">{{ c.score }}</span></li>{% endfor %}</ul>{% else %}<p class="empty">Ninguna.</p>{% endif %}</section>
+  <section class="block"><h2>Leads sin seguimiento</h2>
+    {% if sin_seguimiento %}<ul class="list">{% for c in sin_seguimiento %}<li><span class="chip {{ c.etapa }}">{{ c.etapa }}</span><div><div class="who">{{ persona(c) }}</div><div class="why">último toque tuyo: {{ c.last_human_touch|dt }} · entró {{ c.created_at|dt }}</div></div><span class="muted">{{ c.score }}</span></li>{% endfor %}</ul>{% else %}<p class="empty">Ninguno.</p>{% endif %}</section>
+</div>
+
+<section class="section block"><h2>Reactivación <span class="sub">segmentos automáticos</span></h2>
+  <div class="grid g3">
+    {% for nombre, lista in reactivacion.items() %}
+    <div><h3>{{ nombre }} <span class="muted">({{ lista|length }})</span></h3>
+      {% if lista %}<ul class="list" style="margin-top:8px">{% for c in lista[:10] %}<li><span class="chip {{ c.intencion }}">{{ c.intencion }}</span><div><div class="who">{{ persona(c) }}</div><div class="why">{{ c.interes or '' }} · {{ (c.last_inbound_at or c.mc_last_interaction or c.created_at)|dt }}</div></div><span class="muted">{{ c.score }}</span></li>{% endfor %}</ul>{% else %}<p class="empty">Vacío.</p>{% endif %}</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section block">
+  <h2>Cupo de ManyChat <span class="sub">contactos que ocupan plan sin aportar</span></h2>
+  {% if archivables %}
+  <p><b>{{ archivables|length }}</b> contactos llevan 60+ días sin interactuar, nunca respondieron la pregunta ni hicieron clic, y no son clientes. Su ficha e historial se quedan aquí; en ManyChat puedes archivarlos para no pagar por ellos. Si vuelven a escribir, la app los reconoce por su usuario de Instagram.</p>
+  <div class="actions"><a class="btn small" href="/exportar-archivables.csv">Descargar lista para ManyChat</a></div>
+  <p class="sub" style="margin-top:8px">En ManyChat: Contacts → filtro «Última interacción hace más de 60 días» + «Campo CRM_INTERES está vacío» → seleccionar todos → Bulk actions → Delete. Hazlo una vez al mes.</p>
+  {% else %}<p class="empty">Nada que archivar todavía. Este bloque se llena solo con el tiempo.</p>{% endif %}
+</section>
+
+<div class="section grid g2">
+  <section class="block"><h2>Etiquetas de ManyChat <span class="sub">{% for k, v in clases.items() %}{{ k }} {{ v }}{{ ' · ' if not loop.last }}{% endfor %}</span></h2>
+    {% if tags %}<div class="tbl"><table><tr><th>Etiqueta</th><th class="num">Contactos</th><th>Clasificación</th><th>Motivo</th></tr>
+      {% for t in tags %}<tr><td>{{ t.name }}</td><td class="num">{{ t.contact_count }}</td><td>{{ chip(t.classification) }}</td><td class="muted">{{ t.reason or '' }}</td></tr>{% endfor %}</table></div>
+    {% else %}<p class="empty">Todavía no se han leído las etiquetas. Pulsa «Leer catálogos de ManyChat» en Configuración.</p>{% endif %}</section>
+  <section class="block"><h2>Duplicados detectados</h2>
+    {% if duplicados %}<div class="tbl"><table><tr><th>Campo</th><th>Valor</th><th>Registros</th></tr>{% for d in duplicados %}<tr><td>{{ d.campo }}</td><td>{{ d.valor }}</td><td>{% for c in d.contactos %}<a href="/contactos/{{ c.id }}">#{{ c.id }} {{ c.display }}</a> ({{ c.etapa }}){{ ', ' if not loop.last }}{% endfor %}</td></tr>{% endfor %}</table></div>
+    <p class="sub">Para fusionarlos, aprueba la propuesta en <a href="/propuestas">Propuestas</a>.</p>{% else %}<p class="empty">Ninguno.</p>{% endif %}</section>
+</div>
+
+<div class="section grid g2">
+  <section class="block"><h2>Automatizaciones <span class="sub">contadas con lo que ManyChat empuja</span></h2>
+    {% if autos %}<div class="tbl"><table><tr><th>Automatización</th><th class="num">Entradas</th><th class="num">Respondieron</th><th class="num">Abandonaron</th><th class="num">Clics</th><th class="num">Leads</th><th class="num">Oport.</th><th class="num">Ventas</th><th class="num">Tasa resp.</th></tr>
+      {% for a in autos %}<tr><td>{{ a.nombre }}{% if a.problema %} <span class="chip CALIENTE">revisar</span>{% endif %}</td><td class="num">{{ a.entradas }}</td><td class="num">{{ a.respondieron }}</td><td class="num">{{ a.abandonaron }}</td><td class="num">{{ a.clicks }}</td><td class="num">{{ a.leads }}</td><td class="num">{{ a.oportunidades }}</td><td class="num">{{ a.ventas }}</td><td class="num">{{ a.tasa_respuesta }} %</td></tr>{% endfor %}</table></div>
+    {% else %}<p class="empty">Sin datos todavía.</p>{% endif %}</section>
+  <section class="block"><h2>Por país</h2>
+    {% if paises %}<div class="tbl"><table><tr><th>País</th><th class="num">Contactos</th><th class="num">Leads</th><th class="num">Calientes</th><th class="num">Ventas</th><th class="num">Ingresos</th><th class="num">Lead %</th><th class="num">Venta %</th></tr>
+      {% for p in paises %}<tr><td>{{ p.pais }}</td><td class="num">{{ p.contactos }}</td><td class="num">{{ p.leads }}</td><td class="num">{{ p.calientes }}</td><td class="num">{{ p.ventas }}</td><td class="num">{{ p.ingresos|num }}</td><td class="num">{{ p.tasa_lead }}</td><td class="num">{{ p.tasa_venta }}</td></tr>{% endfor %}</table></div>
+    {% else %}<p class="empty">Sin datos todavía.</p>{% endif %}</section>
+</div>
+{% endblock %}

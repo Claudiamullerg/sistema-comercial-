@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from "macros.html" import val %}
+{% block content %}
+<div class="head"><div><h1>Valor comercial del contenido</h1><div class="sub">Por Reel: Alcance (a cuántas llegó) · Conversación (a cuántas hizo escribir) · Negocio (a cuántas acercó a una venta)</div></div>
+  {% if ig_ok %}<form method="post" action="/sync/instagram"><button class="sec small">Actualizar desde Instagram</button></form>{% endif %}</div>
+
+<div class="tbl block" style="padding:0"><table>
+  <tr><th>Contenido</th><th>Keyword</th><th class="num">Vistas</th><th class="num">Interacciones</th><th class="num">Seguidores +</th><th class="num">Contactos</th><th class="num">Leads</th><th class="num">Conv.</th><th class="num">Oport.</th><th class="num">Ventas</th><th class="num">Contactos / 1.000 vistas</th><th>Veredicto</th></tr>
+  {% for f in filas %}
+  <tr>
+    <td><a href="#editar-{{ f.id }}" onclick="document.getElementById('editar-{{ f.id }}').open=true">{{ f.title }}</a> <span class="muted" style="font-size:11px">{{ f.type }}</span></td>
+    <td>{{ f.keyword or '—' }}</td>
+    <td class="num">{{ val(f.views) }}</td><td class="num">{{ val(f.interactions) }}</td><td class="num">{{ val(f.followers_gained) }}</td>
+    <td class="num">{{ f.contactos }}</td><td class="num">{{ f.leads }}</td><td class="num">{{ f.conversaciones }}</td><td class="num">{{ f.oportunidades }}</td><td class="num">{{ f.ventas }}{% if f.ingresos %} <span class="muted">({{ f.ingresos }})</span>{% endif %}</td>
+    <td class="num">{{ val(f.contactos_por_mil_views) }}</td>
+    <td>{{ f.veredicto if f.contactos else '<span class="muted">sin contactos atribuidos aún</span>'|safe }}</td>
+  </tr>
+  {% endfor %}
+</table></div>
+<p class="sub" style="margin-top:8px">Un Reel con muchas vistas y pocos contactos es «viral, bajo negocio». Un Reel con pocas vistas y contactos que compran es «poco viral, ALTO negocio»: ese es el que se repite.</p>
+
+<div class="section grid g2">
+  {% for f in filas %}
+  <details id="editar-{{ f.id }}" class="block"><summary>Editar «{{ f.title }}»</summary>
+    <form method="post" action="/contenido" class="filters" style="margin-top:10px"><input type="hidden" name="id" value="{{ f.id }}">
+      <div class="field" style="flex:1 1 240px"><label>Título</label><input name="title" value="{{ f.title }}" style="width:100%"></div>
+      <div class="field"><label>Tipo</label><select name="type">{% for t in ['REEL','POST','HISTORIA','LIVE'] %}<option {{ 'selected' if t == f.type }}>{{ t }}</option>{% endfor %}</select></div>
+      <div class="field"><label>Keyword</label><input name="keyword" value="{{ f.keyword or '' }}" style="width:110px"></div>
+      <div class="field"><label>Vistas</label><input name="views" value="{{ f.views or '' }}" style="width:100px"></div>
+      <div class="field"><label>Interacciones</label><input name="interactions" value="{{ f.interactions or '' }}" style="width:100px"></div>
+      <div class="field"><label>Seguidores +</label><input name="followers_gained" value="{{ f.followers_gained or '' }}" style="width:90px"></div>
+      <div class="field"><label>Alcance</label><input name="reach" value="" style="width:90px"></div>
+      <div class="field" style="flex:1 1 200px"><label>URL</label><input name="url" value="{{ f.url or '' }}" style="width:100%"></div>
+      <button type="submit">Guardar</button>
+    </form>
+  </details>
+  {% endfor %}
+</div>
+
+<section class="section block">
+  <h2>Registrar un Reel nuevo</h2>
+  <p class="sub">Regístralo con el mismo nombre corto que pones en ManyChat en el campo CRM_ORIGEN_CONTENIDO (ej. «reel-es-muy-caro»). Así cada contacto que entre por ese Reel queda atribuido solo.</p>
+  <form method="post" action="/contenido" class="filters">
+    <div class="field" style="flex:1 1 240px"><label for="n-title">Título o nombre corto</label><input id="n-title" name="title" required style="width:100%" placeholder="reel-es-muy-caro"></div>
+    <div class="field"><label for="n-type">Tipo</label><select id="n-type" name="type"><option>REEL</option><option>POST</option><option>HISTORIA</option><option>LIVE</option></select></div>
+    <div class="field"><label for="n-kw">Keyword</label><input id="n-kw" name="keyword" placeholder="FRONTERA" style="width:110px"></div>
+    <div class="field"><label for="n-views">Vistas</label><input id="n-views" name="views" style="width:100px"></div>
+    <div class="field"><label for="n-int">Interacciones</label><input id="n-int" name="interactions" style="width:100px"></div>
+    <div class="field"><label for="n-fol">Seguidores +</label><input id="n-fol" name="followers_gained" style="width:90px"></div>
+    <div class="field"><label for="n-date">Publicado</label><input id="n-date" name="published_at" type="date"></div>
+    <div class="field" style="flex:1 1 200px"><label for="n-url">URL</label><input id="n-url" name="url" style="width:100%"></div>
+    <button type="submit">Guardar</button>
+  </form>
+</section>
+{% endblock %}

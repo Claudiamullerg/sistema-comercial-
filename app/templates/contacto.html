@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "macros.html" import val, chip %}
+{% block title %}{{ c.display }} · {{ app_name }}{% endblock %}
+{% block content %}
+<div class="head">
+  <div><h1>{{ c.display }}</h1><div class="sub">{{ c.name or '' }} {% if c.ig_username %}· <a href="https://instagram.com/{{ c.ig_username }}" target="_blank" rel="noopener">abrir Instagram</a>{% endif %} {% if c.manychat_id %}· ManyChat #{{ c.manychat_id }}{% endif %} · {{ c.sync_status }}</div></div>
+  <div class="actions">{{ chip(c.origen_tipo) }}{{ chip(c.interes) }}{{ chip(c.intencion) }}{{ chip(c.etapa) }}<span class="chip">score {{ c.score }}</span></div>
+</div>
+
+{% if c.needs_reply %}<div class="alert alta"><div class="t">Escribió y espera respuesta{% if c.last_inbound_at %} desde {{ c.last_inbound_at|dt }}{% endif %}.</div>{% if c.mc_last_input_text %}<div class="b">«{{ c.mc_last_input_text }}»</div>{% endif %}</div>{% endif %}
+{% if reactivacion %}<div class="alert media" style="margin-top:8px"><div class="t">Reactivación</div><div class="b">{{ reactivacion }}</div></div>{% endif %}
+
+<div class="section grid g2">
+  <section class="block">
+    <h2>Acciones</h2>
+    <div class="actions" style="margin-bottom:12px">
+      <form method="post" action="/contactos/{{ c.id }}/accion" class="inline"><input type="hidden" name="accion" value="respondi"><button type="submit">Ya le respondí</button></form>
+      <form method="post" action="/contactos/{{ c.id }}/accion" class="inline"><input type="hidden" name="accion" value="no_interesado"><button type="submit" class="sec">No interesada</button></form>
+      <form method="post" action="/contactos/{{ c.id }}/accion" class="inline"><input type="hidden" name="accion" value="seguimiento"><input type="hidden" name="valor" value="3"><button type="submit" class="sec">Recordar en 3 días</button></form>
+    </div>
+    <form method="post" action="/contactos/{{ c.id }}/accion" class="filters"><input type="hidden" name="accion" value="etapa">
+      <div class="field"><label for="etapa">Cambiar etapa</label><select id="etapa" name="valor">{% for e in ETAPAS %}<option {{ 'selected' if e == c.etapa }}>{{ e }}</option>{% endfor %}</select></div><button type="submit" class="sec">Guardar</button></form>
+    <form method="post" action="/contactos/{{ c.id }}/accion" class="filters"><input type="hidden" name="accion" value="interes">
+      <div class="field"><label for="interes">Interés</label><select id="interes" name="valor">{% for e in INTERESES %}<option {{ 'selected' if e == c.interes }}>{{ e }}</option>{% endfor %}</select></div><button type="submit" class="sec">Guardar</button></form>
+    <form method="post" action="/contactos/{{ c.id }}/accion" class="filters"><input type="hidden" name="accion" value="contenido">
+      <div class="field"><label for="contenido">Reel de origen</label><select id="contenido" name="valor"><option value="">— sin asignar —</option>{% for ct in contenidos %}<option value="{{ ct.id }}" {{ 'selected' if ct.id == c.origen_content_id }}>{{ ct.title }}</option>{% endfor %}</select></div><button type="submit" class="sec">Guardar</button></form>
+    <form method="post" action="/contactos/{{ c.id }}/accion" class="filters"><input type="hidden" name="accion" value="venta">
+      <div class="field"><label for="producto">Registrar venta</label><input id="producto" name="producto" value="FRONTERA" style="width:130px"></div>
+      <div class="field"><label for="monto">Monto</label><input id="monto" name="monto" value="197" style="width:80px"></div>
+      <div class="field"><label for="moneda">Moneda</label><input id="moneda" name="moneda" value="USD" style="width:60px"></div><button type="submit">Registrar</button></form>
+    <form method="post" action="/contactos/{{ c.id }}/accion" class="filters"><input type="hidden" name="accion" value="nota">
+      <div class="field" style="flex:1"><label for="nota">Nota</label><input id="nota" name="valor" placeholder="Qué hablamos, qué quedó pendiente" style="width:100%"></div><button type="submit" class="sec">Añadir</button></form>
+  </section>
+
+  <section class="block">
+    <h2>Ficha</h2>
+    <dl class="kv">
+      <dt>Email</dt><dd>{{ c.email or '—' }}</dd>
+      <dt>Teléfono</dt><dd>{{ c.phone or '—' }}</dd>
+      <dt>País</dt><dd>{{ c.country or '—' }} {% if c.timezone %}<span class="muted">({{ c.timezone }})</span>{% endif %}</dd>
+      <dt>Te sigue</dt><dd>{{ 'sí' if c.mc_follows_account else ('no' if c.mc_follows_account is false else '—') }}</dd>
+      <dt>Origen</dt><dd>{{ c.origen_tipo or '—' }}{% if c.origen_content %} · «{{ c.origen_content.title }}»{% endif %}{% if c.origen_keyword %} · keyword {{ c.origen_keyword }}{% endif %}{% if c.origen_automation %} · flujo {{ c.origen_automation }}{% endif %}{% if c.origen_fecha %} · {{ c.origen_fecha|dt(false) }}{% endif %}</dd>
+      <dt>Respuesta a la pregunta</dt><dd>{{ c.respuesta_pregunta or '—' }}</dd>
+      <dt>Problema</dt><dd>{{ c.problema or '—' }}</dd>
+      <dt>Objeción</dt><dd>{{ c.objecion or '—' }}</dd>
+      <dt>Etiqueta de intención</dt><dd>{{ c.intent_label or '—' }} · temperatura {{ c.temperatura }}</dd>
+      <dt>Interacciones / clics</dt><dd>{{ c.interacciones }} / {{ c.clicks }}</dd>
+      <dt>Última interacción</dt><dd>{{ (c.last_inbound_at or c.mc_last_interaction)|dt(false) }}</dd>
+      <dt>Último toque tuyo</dt><dd>{{ c.last_human_touch|dt(false) }}</dd>
+      <dt>Próximo seguimiento</dt><dd>{{ c.next_followup_at|dt(false) }}</dd>
+      <dt>Etiquetas ManyChat</dt><dd>{% for t in c.mc_tags %}<span class="chip">{{ t.name }}</span> {% else %}—{% endfor %}</dd>
+      <dt>Campos ManyChat</dt><dd>{% for k, v in c.mc_custom_fields.items() if v %}<span class="muted">{{ k }}:</span> {{ v }}<br>{% else %}—{% endfor %}</dd>
+      <dt>Ventas</dt><dd>{% for s in c.sales %}{{ s.product }} · {{ s.amount }} {{ s.currency }} · {{ s.sold_at|dt(false) }}<br>{% else %}—{% endfor %}</dd>
+      <dt>Notas</dt><dd style="white-space:pre-line">{{ c.notes or '—' }}</dd>
+    </dl>
+  </section>
+</div>
+
+<section class="section block">
+  <h2>Historial <span class="sub">cada cambio queda registrado</span></h2>
+  <ul class="timeline">
+    {% for e in c.events %}
+    <li><span class="when">{{ e.created_at|dt(false) }}</span><span class="type">{{ e.type }}{% if e.field %} · {{ e.field }}{% endif %}</span>
+      <span>{% if e.old_value and e.new_value %}{{ e.old_value }} → {{ e.new_value }}{% else %}{{ e.new_value or e.old_value or '' }}{% endif %} <span class="muted">({{ e.source }})</span></span></li>
+    {% endfor %}
+  </ul>
+</section>
+{% if alertas %}
+<section class="section block"><h2>Alertas de esta persona</h2>
+  <div class="grid" style="gap:8px">{% for a in alertas %}<div class="alert {{ a.level }}"><div class="t">{{ a.title }} <span class="muted" style="font-weight:400;font-size:12px">· {{ a.status }} · {{ a.created_at|dt }}</span></div>{% if a.status == 'abierta' %}<div class="actions" style="margin-top:6px"><form method="post" action="/alertas/{{ a.id }}/resolver"><input type="hidden" name="next" value="/contactos/{{ c.id }}"><button class="small sec">Resuelta</button></form></div>{% endif %}</div>{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,203 @@
+
+<title>Guía Paso a Paso Fase 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Poppins:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F7F2EE; --surface:#FFFDFB; --ink:#2A1B10; --ink-2:#6B5A4E; --accent:#3B2611; --accent-soft:#E9DCCF;
+  --line:#E3D8CF; --good:#2E7D4F; --warn:#B7791F; --crit:#B3402F; --mark:#F3E4D3;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1E1613; --surface:#271D18; --ink:#F1E9E3; --ink-2:#C9BBAF; --accent:#D9B48F; --accent-soft:#3A2C24;
+    --line:#3A2C24; --good:#7BC49A; --warn:#E0B060; --crit:#E58A78; --mark:#3A2C24; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1E1613; --surface:#271D18; --ink:#F1E9E3; --ink-2:#C9BBAF; --accent:#D9B48F; --accent-soft:#3A2C24;
+  --line:#3A2C24; --good:#7BC49A; --warn:#E0B060; --crit:#E58A78; --mark:#3A2C24; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,"Segoe UI",system-ui,sans-serif;font-size:16px;line-height:1.7;
+     padding-block:40px 80px;padding-inline:clamp(16px,5vw,48px)}
+.doc{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:"Playfair Display",Georgia,serif;font-weight:600;line-height:1.2;text-wrap:balance;color:var(--ink)}
+h1{font-size:clamp(30px,4.5vw,42px);margin:0 0 8px}
+h1 + h2{font-family:Poppins,sans-serif;font-weight:500;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin:0 0 24px;border:0;padding:0}
+h2{font-size:clamp(22px,3vw,28px);margin:56px 0 16px;padding-top:24px;border-top:1px solid var(--line)}
+h3{font-size:19px;margin:36px 0 12px}
+p{margin:0 0 16px;max-width:70ch}
+ul,ol{max-width:70ch;padding-left:22px}
+li{margin-bottom:6px}
+strong{font-weight:600}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:var(--mark);padding:1px 6px;border-radius:4px}
+hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+.meta{color:var(--ink-2);font-size:14px;margin-bottom:8px}
+.tbl{overflow-x:auto;margin:20px 0 28px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.5;font-variant-numeric:tabular-nums}
+th,td{padding:11px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-weight:600;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);background:var(--accent-soft)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:500;white-space:nowrap}
+.tbl.compare td:first-child{white-space:normal;min-width:130px}
+.tbl.compare th:nth-child(4),.tbl.compare td:nth-child(4){background:var(--mark)}
+.tbl.compare td{min-width:200px}
+blockquote{margin:24px 0;padding:16px 20px;border-left:3px solid var(--accent);background:var(--surface);font-family:"Playfair Display",serif;font-size:19px;line-height:1.45}
+.verdict{margin:16px 0 8px;padding:14px 18px;border-left:3px solid var(--accent);background:var(--surface);max-width:70ch}
+.toc{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 40px;padding:0;list-style:none;font-size:14px}
+.toc a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line)}
+.toc a:hover,.toc a:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+a{color:var(--accent)}
+@media (max-width:600px){ th,td{padding:9px 10px} body{font-size:15px} }
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+<main class="doc"><h1 id="guia-paso-a-paso-fase-1">Guía paso a paso · Fase 1</h1>
+<h2 id="sistema-comercial-claudia-muller">Sistema Comercial · Claudia Müller</h2>
+<p>Esta guía está pensada para hacerla sola, en el orden en que está. Cada bloque dice cuánto tarda y qué tiene que pasar para saber que salió bien. Si algo no coincide con lo que ves en pantalla, para ahí y me lo cuentas; no sigas adivinando.</p>
+<p>Hay dos caminos y los dos sirven: el <strong>Camino A</strong> es verlo funcionar hoy en tu Mac (20 minutos, sin gastar nada). El <strong>Camino B</strong> es ponerlo en internet para que ManyChat y Hotmart le manden datos solos (30 minutos, ≈ 5 USD/mes). Haz A primero para conocer la app; B es la fase 1 completa.</p>
+<hr />
+<h2 id="que-hay-en-la-carpeta">Qué hay en la carpeta</h2>
+<p><code>sistema-comercial/
+  run.sh                 ← arranca la app en tu Mac
+  .env.example           ← plantilla de configuración (se copia como .env)
+  app/                   ← la aplicación (no hace falta tocarla)
+  tests/                 ← 13 pruebas automáticas del flujo completo (todas pasan)
+  docs/                  ← este documento y la auditoría
+  Dockerfile, railway.json  ← para ponerla en internet</code></p>
+<hr />
+<h2 id="camino-a-verla-funcionar-en-tu-mac-20-min">Camino A · Verla funcionar en tu Mac (20 min)</h2>
+<p><strong>1. Descomprime la carpeta</strong> en Documentos. Queda <code>Documentos/sistema-comercial</code>.</p>
+<p><strong>2. Abre Terminal</strong> (Spotlight → escribe "Terminal" → Enter). No te asustes con la ventana negra: solo vas a pegar tres líneas.</p>
+<p><strong>3. Comprueba que tienes Python.</strong> Pega y Enter:
+<code>python3 --version</code>
+Debe decir <code>Python 3.9</code> o superior (el Mac trae 3.9.6 y sirve). Si dice "command not found", instala Python desde python.org (botón amarillo "Download", abrir el instalador, siguiente-siguiente) y vuelve a este paso.</p>
+<p><strong>4. Entra en la carpeta y arranca:</strong>
+<code>cd ~/Documents/sistema-comercial
+bash run.sh</code>
+La primera vez tarda 1–2 minutos (instala lo que necesita). Cuando veas <code>Listo. Abre en tu navegador: http://localhost:8000</code>, ya está.</p>
+<p><strong>5. Abre Safari o Chrome</strong> y entra en <code>http://localhost:8000</code>.
+Qué tienes que ver: el Panel con tus números de Instagram de los últimos 30 días (1.649.894 visualizaciones, +5.155 seguidores…) y, en todo lo que depende de ManyChat, la etiqueta <code>PENDIENTE DE SINCRONIZACIÓN</code>. Eso es correcto: la app no inventa cifras.</p>
+<p><strong>6. Recorre las pestañas</strong> para conocerla: Panel, Contactos (vacío), Alertas (vacío), Contenido (tus 3 Reels de la línea base ya están), Salud, Propuestas, Configuración.</p>
+<p><strong>7. Prueba el flujo con un contacto de mentira.</strong> En Configuración verás la URL del webhook. Abre otra pestaña de Terminal (⌘N) y pega esto tal cual:
+<code>curl -X POST "http://localhost:8000/webhooks/manychat?secret=cambia-este-secreto-por-uno-largo" -H "Content-Type: application/json" -d '{"evento":"ENTRADA","subscriber_id":"1","ig_username":"prueba_maria","origen_tipo":"REEL","origen_contenido":"reel-es-muy-caro","keyword":"FRONTERA","last_input_text":"Hola, cuánto cuesta la sesión?"}'</code>
+Vuelve al navegador y recarga el Panel. Qué tienes que ver: <code>@prueba_maria</code> en "Acciones" con el motivo "Pidió información", una alerta 💬 y el pipeline con 1 en CONVERSACIÓN. Entra en su ficha, pulsa <strong>Ya le respondí</strong> y mira cómo cambia el historial. Ese es el sistema entero en pequeño.</p>
+<p><strong>8. Para parar la app:</strong> en la Terminal donde corre, <code>Ctrl + C</code>. Para volver a arrancarla otro día: pasos 4 y 5 (ya no tarda).</p>
+<p>Si quieres borrar el contacto de prueba antes de conectar lo real: cierra la app, borra el archivo <code>data/sistema.db</code> y arranca de nuevo. Todo vuelve a cero salvo la línea base de Instagram, que se siembra sola.</p>
+<hr />
+<h2 id="camino-b-ponerla-en-internet-30-min-5-usdmes">Camino B · Ponerla en internet (30 min, ≈ 5 USD/mes)</h2>
+<p>La app necesita estar encendida 24/7 con una dirección pública para que ManyChat y Hotmart le envíen datos. Railway lo hace sin que tengas que administrar nada.</p>
+<p><strong>1. Crea una cuenta en GitHub</strong> (github.com → Sign up, gratis). Es donde vive el código; Railway lo lee de ahí.</p>
+<p><strong>2. Sube la carpeta a GitHub</strong> (la forma sin comandos):
+- En GitHub: botón <strong>+</strong> arriba a la derecha → <strong>New repository</strong> → nombre <code>sistema-comercial</code> → marca <strong>Private</strong> → <strong>Create repository</strong>.
+- En la página que aparece, pulsa el enlace <strong>uploading an existing file</strong>.
+- Arrastra TODO el contenido de la carpeta <code>sistema-comercial</code> (no la carpeta, su contenido). Espera a que suba. Abajo, <strong>Commit changes</strong>.
+- Comprueba que se ven <code>app</code>, <code>docs</code>, <code>tests</code>, <code>Dockerfile</code>, <code>run.sh</code>, <code>requirements.txt</code>, <code>railway.json</code>. Los archivos que empiezan por punto (<code>.env.example</code>, <code>.gitignore</code>) a veces el Mac los oculta: pulsa <code>⌘ + Shift + .</code> en el Finder para verlos y súbelos también.</p>
+<p><strong>3. Crea la cuenta en Railway</strong> (railway.app → Login with GitHub). Elige el plan <strong>Hobby</strong> (5 USD/mes; incluye el uso de una app pequeña como esta).</p>
+<p><strong>4. Crea el proyecto:</strong> <strong>New Project</strong> → <strong>Deploy from GitHub repo</strong> → elige <code>sistema-comercial</code>. Railway detecta el <code>Dockerfile</code> y construye la app (2–4 minutos). Verás un cuadro con el nombre del servicio.</p>
+<p><strong>5. Añade la base de datos:</strong> en el mismo proyecto, botón <strong>+ New</strong> → <strong>Database</strong> → <strong>PostgreSQL</strong>. Railway la crea y la conecta.</p>
+<p><strong>6. Configura las variables.</strong> Pulsa en el servicio de la app → pestaña <strong>Variables</strong> → <strong>+ New Variable</strong> y añade estas (una por una):</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DATABASE_URL</code></td>
+<td>pulsa <strong>Add Reference</strong> → elige <code>Postgres</code> → <code>DATABASE_URL</code> (la app la entiende tal cual)</td>
+</tr>
+<tr>
+<td><code>WEBHOOK_SECRET</code></td>
+<td>inventa una palabra larga sin espacios (ej. <code>frontera-2026-luz-verde-93</code>)</td>
+</tr>
+<tr>
+<td><code>PANEL_PASSWORD</code></td>
+<td>la contraseña con la que entrarás al panel</td>
+</tr>
+<tr>
+<td><code>MANYCHAT_API_KEY</code></td>
+<td>la clave de ManyChat (ver Bloque 1 abajo). Si aún no la tienes, déjala para después</td>
+</tr>
+<tr>
+<td><code>MANYCHAT_WRITEBACK</code></td>
+<td><code>false</code> por ahora</td>
+</tr>
+<tr>
+<td><code>HOTMART_HOTTOK</code></td>
+<td>el token de Hotmart (ver Bloque 3). Si aún no, después</td>
+</tr>
+</tbody>
+</table></div>
+<p>Railway redespliega solo al guardar.</p>
+<p><strong>7. Dale una dirección pública:</strong> pestaña <strong>Settings</strong> → <strong>Networking</strong> → <strong>Generate Domain</strong>. Te da algo como <code>sistema-comercial-production.up.railway.app</code>. Esa es la dirección de tu app. Ábrela: te pide la contraseña del panel y entras.</p>
+<p>Qué tienes que ver: el mismo Panel que en tu Mac. A partir de aquí, la dirección de Railway es la buena; la de tu Mac queda para pruebas.</p>
+<hr />
+<h2 id="bloque-1-manychat-como-portero-45-min">Bloque 1 · ManyChat como portero (45 min)</h2>
+<p>Objetivo: que cada persona que interactúe con un Reel llegue a la app con su origen, y que se le haga una sola pregunta.</p>
+<p><strong>1. Clave de API.</strong> ManyChat → Settings (abajo a la izquierda) → <strong>API</strong> → <strong>Generate your API Key</strong> → copia. Pégala en Railway como <code>MANYCHAT_API_KEY</code> (Camino B, paso 6). Nunca la pegues en un chat ni en un correo.</p>
+<p><strong>2. Crea los campos.</strong> En la app → Configuración → botón <strong>Crear campos CRM_* en ManyChat</strong>. Debe decir "Campos CRM creados: CRM_ORIGEN_TIPO, CRM_ORIGEN_CONTENIDO, …". Compruébalo en ManyChat → Settings → Fields → Custom User Fields.</p>
+<p><strong>3. Lee los catálogos.</strong> Botón <strong>Leer catálogos</strong>. En Salud verás todas tus etiquetas actuales clasificadas (ACTIVA / DUPLICADA / SIN USO…). No borres nada todavía: solo mira.</p>
+<p><strong>4. Registra tus Reels con CTA.</strong> En la app → Contenido → "Registrar un Reel nuevo". Un nombre corto por Reel, en minúsculas y con guiones, por ejemplo <code>reel-es-muy-caro</code>, y su keyword (<code>FRONTERA</code>). Rellena vistas e interacciones copiándolas de Instagram (pestaña Insights del Reel). Este nombre corto es el que une el Reel con sus contactos.</p>
+<p><strong>5. Reforma el flujo de la keyword</strong> (por ejemplo el de FRONTERA). Ábrelo en ManyChat y déjalo con esta forma, nada más:</p>
+<ol>
+<li>Disparador: comentario con la keyword (o respuesta a historia, o DM con la keyword).</li>
+<li>Acción <strong>Set Custom Field</strong> × 4: <code>CRM_ORIGEN_TIPO = REEL</code>, <code>CRM_ORIGEN_CONTENIDO = reel-es-muy-caro</code>, <code>CRM_KEYWORD = FRONTERA</code>, <code>CRM_AUTOMATIZACION = Reel es muy caro → FRONTERA</code>. (Cambia los valores en cada flujo; es lo único que cambia entre flujos.)</li>
+<li>Mensaje 1: tu texto de bienvenida y lo que prometiste (guía, enlace…).</li>
+<li>Acción <strong>External Request</strong> con <code>"evento": "ENTRADA"</code> (bloque de abajo).</li>
+<li>Mensaje 2 con la pregunta inteligente y 4 <strong>quick replies</strong>:
+   «Para enviarte lo que de verdad te sirve: ¿en qué punto estás hoy?»
+   - Quiero convertir mi experiencia en un negocio
+   - Tengo un negocio y quiero venderlo mejor
+   - No sé qué sigue después de esta etapa
+   - Quiero saber cómo trabajas / precios
+   Cada quick reply hace <strong>Set Custom Field</strong> <code>CRM_RESPUESTA</code> = el texto de la opción, y a continuación un <strong>External Request</strong> con <code>"evento": "RESPUESTA"</code>.</li>
+<li>Después de la respuesta, un mensaje corto que corresponda a la opción (dos o tres frases, sin oferta). Fin del flujo. <strong>No añadas más pasos automáticos</strong>: desde aquí decide la app y avisa a Claudia si hace falta.</li>
+</ol>
+<p><strong>El External Request</strong>, paso a paso: en el flujo, <strong>+ Action</strong> → <strong>External Request</strong> (Dev Tools). Method <code>POST</code>. Request URL: <code>https://TU-DIRECCION-DE-RAILWAY/webhooks/manychat?secret=TU-WEBHOOK-SECRET</code>. Headers: <code>Content-Type</code> = <code>application/json</code>. Body (pestaña Body → Raw):</p>
+<p><code>{
+  "evento": "ENTRADA",
+  "subscriber_id": "{{user_id}}",
+  "ig_username": "{{ig_username}}",
+  "name": "{{full_name}}",
+  "email": "{{email}}",
+  "phone": "{{phone}}",
+  "last_input_text": "{{last_input_text}}",
+  "origen_tipo": "{{cuf_CRM_ORIGEN_TIPO}}",
+  "origen_contenido": "{{cuf_CRM_ORIGEN_CONTENIDO}}",
+  "keyword": "{{cuf_CRM_KEYWORD}}",
+  "automatizacion": "{{cuf_CRM_AUTOMATIZACION}}",
+  "respuesta": "{{cuf_CRM_RESPUESTA}}"
+}</code>
+Las partes entre llaves dobles no se escriben a mano: se insertan con el botón <strong>{ }</strong> del editor eligiendo la variable (Contact ID, Instagram Username, Full Name, Email, Phone, Last Input Text y tus campos CRM_<em>). Pulsa </em><em>Test request</em>*: debe responder <code>"ok": true</code>, y en la app → Configuración → Registro aparece "nuevo @tu_usuario". Guarda. Publica el flujo.</p>
+<p>Copia ese mismo External Request en el paso de <code>RESPUESTA</code> (cambiando solo <code>"evento": "RESPUESTA"</code>) y, si tienes un botón con enlace, después del clic con <code>"evento": "CLICK"</code>.</p>
+<p><strong>6. Regla de oro para ManyChat desde hoy:</strong> no crear etiquetas nuevas. No crear campos nuevos. Cada Reel nuevo = registrar el Reel en la app + duplicar el flujo cambiando los 4 valores del paso 2. Nada más.</p>
+<p><strong>7. Carga inicial de los contactos que ya tienes</strong> (opcional, cuando quieras): ManyChat → Contacts → selecciona todos → Bulk Actions → <strong>Send Flow</strong> → elige un flujo nuevo que contenga solo el External Request con <code>"evento": "IMPORTACION"</code>. Cada contacto llega a la app con lo que ManyChat sepa de él. Si son miles, hazlo por tandas de 500 para no saturar. Alternativa: exportar a Google Sheets desde ManyChat, descargar como CSV e importarlo en la app → Configuración → Importar contactos.</p>
+<hr />
+<h2 id="bloque-2-systemeio-gobernado-por-la-app-fase-1-15-min">Bloque 2 · Systeme.io gobernado por la app (fase 1: 15 min)</h2>
+<p>En la fase 1 Systeme.io solo envía los correos que ya tienes. La única regla: la etiqueta que dispara una secuencia se llama igual que un interés de la app (<code>MONETIZACION</code>, <code>NEGOCIO</code>, <code>SEGUNDA_ETAPA</code>, <code>OFERTA</code>, <code>REINVENCION</code>, <code>EXPERIENCIA</code>) y se pone a mano desde Systeme.io cuando una persona te da su email en conversación. En la fase 2 el email pasa a la app y este bloque desaparece.</p>
+<hr />
+<h2 id="bloque-3-hotmart-avisa-las-ventas-10-min">Bloque 3 · Hotmart avisa las ventas (10 min)</h2>
+<p>Hotmart → <strong>Herramientas</strong> → <strong>Webhook (Postback)</strong> → <strong>Crear webhook</strong>. URL: <code>https://TU-DIRECCION-DE-RAILWAY/webhooks/hotmart</code>. Eventos: marca <strong>Compra aprobada</strong>, <strong>Compra completa</strong>, <strong>Reembolso</strong>, <strong>Carrito abandonado</strong> y <strong>Boleto impreso</strong>. Versión 2.0.0. Guarda. Hotmart te muestra un token <strong>hottok</strong>: pégalo en Railway como <code>HOTMART_HOTTOK</code>.</p>
+<p>Qué pasa después: cada compra crea o encuentra a la persona por su email o teléfono, la marca VENTA, guarda importe y país, y si venía de un Reel, la venta queda atribuida a ese Reel en Contenido. Los carritos abandonados se convierten en alerta 💰 para que les escribas.</p>
+<hr />
+<h2 id="bloque-4-tu-rutina-diaria-10-minutos-al-dia">Bloque 4 · Tu rutina diaria (10 minutos al día)</h2>
+<ol>
+<li>Abre el Panel. Lee solo dos cosas: <strong>Acciones</strong> (a quién hablar hoy) y <strong>Alertas</strong>.</li>
+<li>Por cada persona de la lista: abre su ficha, lee el origen, la respuesta y el último mensaje, respóndele en Instagram (o pásala a WhatsApp), y en la app pulsa <strong>Ya le respondí</strong>. Si agendó, cambia etapa a SESIÓN / OFERTA. Si no le interesa, <strong>No interesada</strong>.</li>
+<li>Una vez por semana: Salud → revisa duplicados y etiquetas → Propuestas → aprueba lo que proceda. Contenido → actualiza vistas e interacciones de los Reels activos.</li>
+<li>Una vez al mes: Configuración → Instagram carga manual → los 30 días (5 minutos con la pestaña de Insights abierta).</li>
+</ol>
+<p>Cuando la app se llena con el volumen real, pasamos a la fase 2 (email dentro de la app, IA que clasifica y redacta, Instagram por API).</p>
+<hr />
+<h2 id="si-algo-falla">Si algo falla</h2>
+<ul>
+<li><strong>"Address already in use" al arrancar en el Mac</strong>: ya hay una copia corriendo. Ciérrala con <code>Ctrl + C</code> en la otra Terminal, o cambia el puerto: <code>PORT=8001 bash run.sh</code>.</li>
+<li><strong>ManyChat dice error en el Test request</strong>: revisa que la URL empiece por <code>https://</code>, que el <code>secret</code> de la URL sea idéntico al <code>WEBHOOK_SECRET</code> de Railway, y que el Body sea JSON válido (sin comas al final de la última línea).</li>
+<li><strong>En Configuración → Registro aparece "Payload sin identificador"</strong>: el External Request no está enviando <code>subscriber_id</code>; vuelve a insertar la variable Contact ID.</li>
+<li><strong>"Error ManyChat 401/403"</strong> al leer catálogos: la clave de API está mal pegada o el plan no es Pro.</li>
+<li><strong>La app en Railway no arranca</strong>: pestaña <strong>Deployments</strong> → <strong>View logs</strong>; casi siempre falta la referencia <code>DATABASE_URL</code> a Postgres.</li>
+<li>Cualquier otra cosa: copia el mensaje de error tal cual y me lo pegas.</li>
+</ul></main>

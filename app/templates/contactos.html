@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "macros.html" import val, chip, persona %}
+{% block content %}
+<div class="head"><div><h1>Contactos</h1><div class="sub">Un registro por persona · {{ rows|length }} mostrados</div></div>
+  <a class="btn sec small" href="/exportar.csv">Exportar CSV</a></div>
+<form method="get" class="filters">
+  <div class="field"><label for="q">Buscar</label><input id="q" name="q" value="{{ q }}" placeholder="@usuario, nombre, email, mensaje"></div>
+  <div class="field"><label for="etapa">Etapa</label><select id="etapa" name="etapa"><option value="">todas</option>{% for e in ETAPAS %}<option {{ 'selected' if e == etapa }}>{{ e }}</option>{% endfor %}</select></div>
+  <div class="field"><label for="intencion">Intención</label><select id="intencion" name="intencion"><option value="">todas</option>{% for e in INTENCIONES %}<option {{ 'selected' if e == intencion }}>{{ e }}</option>{% endfor %}</select></div>
+  <div class="field"><label for="interes">Interés</label><select id="interes" name="interes"><option value="">todos</option>{% for e in INTERESES %}<option {{ 'selected' if e == interes }}>{{ e }}</option>{% endfor %}</select></div>
+  <div class="field"><label for="origen">Origen</label><select id="origen" name="origen"><option value="">todos</option>{% for e in ORIGENES %}<option {{ 'selected' if e == origen }}>{{ e }}</option>{% endfor %}</select></div>
+  <div class="field"><label for="pais">País</label><select id="pais" name="pais"><option value="">todos</option>{% for p in paises %}<option {{ 'selected' if p == pais }}>{{ p }}</option>{% endfor %}</select></div>
+  <div class="field"><label for="pendientes">Esperan respuesta</label><select id="pendientes" name="pendientes"><option value="">no filtrar</option><option value="1" {{ 'selected' if pendientes }}>solo pendientes</option></select></div>
+  <div class="field"><label for="orden">Orden</label><select id="orden" name="orden"><option value="score" {{ 'selected' if orden == 'score' }}>score</option><option value="reciente" {{ 'selected' if orden == 'reciente' }}>más recientes</option></select></div>
+  <button type="submit">Filtrar</button>
+</form>
+{% if rows %}
+<div class="tbl block" style="padding:0"><table>
+  <tr><th>Persona</th><th>Origen</th><th>Interés</th><th>Intención</th><th>Etapa</th><th class="num">Score</th><th>Último mensaje</th><th>Actividad</th><th>País</th></tr>
+  {% for c in rows %}
+  <tr>
+    <td>{{ persona(c) }}{% if c.needs_reply %} <span class="chip CALIENTE" title="Escribió y espera respuesta">espera</span>{% endif %}</td>
+    <td>{{ c.origen_tipo or '—' }}{% if c.origen_content %}<br><span class="muted" style="font-size:12px">{{ c.origen_content.title[:40] }}</span>{% endif %}</td>
+    <td>{{ chip(c.interes) }}</td><td>{{ chip(c.intencion) }}</td><td>{{ chip(c.etapa) }}</td>
+    <td class="num">{{ c.score }}</td>
+    <td class="muted" style="max-width:260px">{{ (c.mc_last_input_text or '')[:90] }}</td>
+    <td class="muted">{{ (c.last_inbound_at or c.mc_last_interaction or c.updated_at)|dt }}</td>
+    <td>{{ c.country or '—' }}</td>
+  </tr>
+  {% endfor %}
+</table></div>
+{% else %}
+<div class="block"><p class="empty">Todavía no hay contactos. Llegan solos cuando ManyChat envíe el primero al webhook, o puedes importar un CSV en <a href="/configuracion">Configuración</a>.</p></div>
+{% endif %}
+{% endblock %}

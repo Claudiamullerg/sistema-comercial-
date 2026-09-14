@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="head"><div><h1>Configuración y sincronización</h1><div class="sub">Conexiones, carga de datos y registro de lo que entra</div></div></div>
+{% if msg %}<div class="msg">{{ msg }}</div>{% endif %}
+
+<div class="grid g3">
+  <div class="block"><h3><span class="dot {{ 'ok' if mc_ok else 'crit' }}"></span>ManyChat</h3>
+    <p class="sub">{% if mc_ok %}Clave de API configurada. Escritura de segmentación: {{ 'activa' if writeback else 'desactivada (MANYCHAT_WRITEBACK=false)' }}. Refresco cada {{ refresh }} min.{% else %}Falta <code>MANYCHAT_API_KEY</code> en el archivo <code>.env</code> (ManyChat → Settings → API). Sin ella el webhook sigue funcionando; solo no se refrescan contactos ni se leen catálogos.{% endif %}</p>
+    <div class="actions">
+      <form method="post" action="/sync/manychat/catalogos"><button class="small sec" {{ '' if mc_ok else 'disabled' }}>Leer catálogos (etiquetas, campos, flujos)</button></form>
+      <form method="post" action="/sync/manychat/campos"><button class="small sec" {{ '' if mc_ok else 'disabled' }}>Crear campos CRM_* en ManyChat</button></form>
+      <form method="post" action="/sync/manychat/refrescar"><button class="small sec" {{ '' if mc_ok else 'disabled' }}>Refrescar contactos ahora</button></form>
+    </div>
+    <p class="sub">{{ n_tags }} etiquetas leídas.</p>
+  </div>
+  <div class="block"><h3><span class="dot {{ 'ok' if hotmart_ok else 'warn' }}"></span>Hotmart</h3>
+    <p class="sub">Webhook: <code>{{ base_url }}/webhooks/hotmart</code><br>{% if hotmart_ok %}Token hottok configurado.{% else %}Pon <code>HOTMART_HOTTOK</code> en <code>.env</code> para validar que el aviso venga de Hotmart.{% endif %}</p></div>
+  <div class="block"><h3><span class="dot {{ 'ok' if ig_ok else 'warn' }}"></span>Instagram</h3>
+    <p class="sub">{% if ig_ok %}Graph API conectada.{% else %}Fase 2. Hasta entonces los números se cargan aquí abajo, una vez al mes.{% endif %}</p>
+    {% if ig_ok %}<form method="post" action="/sync/instagram"><button class="small sec">Actualizar Reels desde Instagram</button></form>{% endif %}</div>
+</div>
+
+<section class="section block">
+  <h2>Claves <span class="sub">se guardan en tu computador (archivo .env), nunca en el chat</span></h2>
+  <form method="post" action="/configuracion/claves" class="filters">
+    <div class="field" style="flex:1 1 260px"><label for="k-mc">Clave de API de ManyChat {% if mc_ok %}<span class="ok">(configurada)</span>{% endif %}</label><input id="k-mc" name="manychat_api_key" type="password" placeholder="pegar aquí y guardar" style="width:100%" autocomplete="off"></div>
+    <div class="field" style="flex:1 1 200px"><label for="k-hm">Token hottok de Hotmart {% if hotmart_ok %}<span class="ok">(configurado)</span>{% endif %}</label><input id="k-hm" name="hotmart_hottok" type="password" placeholder="pegar aquí" style="width:100%" autocomplete="off"></div>
+    <div class="field" style="flex:1 1 200px"><label for="k-ws">Secreto del webhook</label><input id="k-ws" name="webhook_secret" placeholder="{{ secret }}" style="width:100%" autocomplete="off"></div>
+    <div class="field"><label for="k-wb">Escribir segmentación en ManyChat</label><select id="k-wb" name="manychat_writeback"><option value="" {{ '' if writeback else 'selected' }}>no (por ahora)</option><option value="1" {{ 'selected' if writeback }}>sí</option></select></div>
+    <button type="submit">Guardar claves</button>
+  </form>
+  <p class="sub">Deja vacío lo que no quieras cambiar. La clave de ManyChat se genera en ManyChat → Settings → API (solo en plan Pro).</p>
+</section>
+
+<section class="section block">
+  <h2>Probar el sistema <span class="sub">sin ManyChat, sin Terminal</span></h2>
+  <p class="sub">El botón crea un contacto de prueba (usuario <code>prueba_maria</code>) que llega desde el Reel «es muy caro» y pregunta el precio, exactamente como lo enviará ManyChat. Luego mira el Panel: Acciones, Alertas y el pipeline. Cuando termines, bórralos con el segundo botón.</p>
+  <div class="actions">
+    <form method="post" action="/configuracion/prueba"><button type="submit">Crear contacto de prueba</button></form>
+    <form method="post" action="/configuracion/borrar-prueba"><button type="submit" class="sec">Borrar contactos de prueba</button></form>
+  </div>
+</section>
+
+<section class="section block">
+  <h2>Webhook para ManyChat <span class="sub">esto es lo que pegas en el External Request</span></h2>
+  <ol class="steps">
+    <li>En ManyChat, abre el flujo que se dispara con tu keyword (por ejemplo FRONTERA). Después del primer mensaje, añade una acción <b>External Request</b> (está en «Actions» → «External Request»; requiere plan Pro).</li>
+    <li>Método <b>POST</b>. URL: <code>{{ base_url }}/webhooks/manychat?secret={{ secret }}</code></li>
+    <li>Header: <code>Content-Type: application/json</code>. Cuerpo (Body): copia el bloque de abajo. Los valores del Reel y la keyword los pone el flujo en los campos CRM_* justo antes (acción Set Custom Field), así el mismo bloque sirve para todos los flujos.</li>
+    <li>Pulsa «Test request»: aquí abajo, en el registro, debe aparecer «nuevo …» en segundos. Guarda y publica el flujo.</li>
+    <li>Repite el External Request en los otros puntos que importan: después de la respuesta a la pregunta inteligente (con <code>"evento": "RESPUESTA"</code>) y después de un clic en tu enlace (<code>"evento": "CLICK"</code>).</li>
+  </ol>
+<pre>{
+  "evento": "ENTRADA",
+  "subscriber_id": "{{ '{{user_id}}' }}",
+  "ig_username": "{{ '{{ig_username}}' }}",
+  "name": "{{ '{{full_name}}' }}",
+  "email": "{{ '{{email}}' }}",
+  "phone": "{{ '{{phone}}' }}",
+  "last_input_text": "{{ '{{last_input_text}}' }}",
+  "ig_follows_account": "{{ '{{ig_follows_account}}' }}",
+  "origen_tipo": "{{ '{{cuf_CRM_ORIGEN_TIPO}}' }}",
+  "origen_contenido": "{{ '{{cuf_CRM_ORIGEN_CONTENIDO}}' }}",
+  "keyword": "{{ '{{cuf_CRM_KEYWORD}}' }}",
+  "automatizacion": "{{ '{{cuf_CRM_AUTOMATIZACION}}' }}",
+  "respuesta": "{{ '{{cuf_CRM_RESPUESTA}}' }}"
+}</pre>
+  <p class="sub">Las variables entre llaves dobles se eligen con el botón «{ }» del editor de ManyChat (user_id = Contact ID, ig_username = Instagram Username, last_input_text = Last Input Text, cuf_CRM_RESPUESTA = tu campo personalizado CRM_RESPUESTA). También puedes marcar «Full Contact Data»: la app entiende ese formato igual.</p>
+</section>
+
+<div class="section grid g2">
+  <section class="block">
+    <h2>Pregunta inteligente <span class="sub">la única pregunta del flujo</span></h2>
+    <p>«{{ pregunta }}»</p>
+    <p class="sub">Respuestas rápidas (quick replies) y cómo las clasifica la app:</p>
+    <ul>{% for texto, interes in opciones %}<li>«{{ texto }}» → <span class="chip">{{ interes }}</span></li>{% endfor %}</ul>
+    <p class="sub">Cada quick reply guarda su texto en el campo <code>CRM_RESPUESTA</code>; después va el External Request con <code>"evento": "RESPUESTA"</code>.</p>
+  </section>
+  <section class="block">
+    <h2>Campos que la app espera en ManyChat</h2>
+    <div class="tbl"><table><tr><th>Campo</th><th>Para qué</th></tr>{% for k, v in campos.items() %}<tr><td><code>{{ k }}</code></td><td class="muted">{{ v }}</td></tr>{% endfor %}</table></div>
+    <p class="sub">Se crean con un clic arriba («Crear campos CRM_* en ManyChat») cuando la clave de API esté puesta. No crees etiquetas nuevas en ManyChat: la segmentación vive aquí.</p>
+  </section>
+</div>
+
+<div class="section grid g2">
+  <section class="block">
+    <h2>Instagram · carga manual <span class="sub">{% if snap %}último período {{ snap.period_start.strftime('%d/%m') }}–{{ snap.period_end.strftime('%d/%m/%Y') }}{% endif %}</span></h2>
+    <form method="post" action="/configuracion/instagram" class="filters">
+      <div class="field"><label for="ps">Desde</label><input id="ps" type="date" name="period_start" required value="{{ snap.period_start.date() if snap }}"></div>
+      <div class="field"><label for="pe">Hasta</label><input id="pe" type="date" name="period_end" required value="{{ snap.period_end.date() if snap }}"></div>
+      <div class="field"><label for="v">Visualizaciones</label><input id="v" name="views" value="{{ snap.views or '' if snap }}" style="width:110px"></div>
+      <div class="field"><label for="vw">Espectadores</label><input id="vw" name="viewers" value="{{ snap.viewers or '' if snap }}" style="width:110px"></div>
+      <div class="field"><label for="nf">% no seguidores</label><input id="nf" name="non_follower_pct" value="{{ snap.non_follower_pct or '' if snap }}" style="width:80px"></div>
+      <div class="field"><label for="nfo">Seguidores netos</label><input id="nfo" name="net_followers" value="{{ snap.net_followers or '' if snap }}" style="width:90px"></div>
+      <div class="field"><label for="ft">Seguidores totales</label><input id="ft" name="followers_total" value="{{ snap.followers_total or '' if snap }}" style="width:90px"></div>
+      <div class="field"><label for="pv">Visitas al perfil</label><input id="pv" name="profile_visits" value="{{ snap.profile_visits or '' if snap }}" style="width:90px"></div>
+      <div class="field"><label for="lc">Clics en enlace</label><input id="lc" name="link_clicks" value="{{ snap.link_clicks or '' if snap }}" style="width:80px"></div>
+      <div class="field"><label for="rv">Vistas Reels</label><input id="rv" name="reels_views" value="{{ snap.views_by_type.REEL or '' if snap }}" style="width:100px"></div>
+      <div class="field"><label for="ri">Interacciones Reels</label><input id="ri" name="reels_interactions" value="{{ snap.interactions_by_type.REEL or '' if snap }}" style="width:100px"></div>
+      <div class="field"><label for="sv">Vistas Historias</label><input id="sv" name="stories_views" value="{{ snap.views_by_type.HISTORIA or '' if snap }}" style="width:90px"></div>
+      <div class="field"><label for="pov">Vistas Publicaciones</label><input id="pov" name="posts_views" value="{{ snap.views_by_type.POST or '' if snap }}" style="width:90px"></div>
+      <button type="submit">Guardar período</button>
+    </form>
+  </section>
+  <section class="block">
+    <h2>Importar contactos (CSV) <span class="sub">carga inicial opcional</span></h2>
+    <p class="sub">Acepta la exportación de ManyChat a Google Sheets (descargada como CSV) o cualquier CSV con columnas como Subscriber ID, Instagram Username, Name, Email, Phone, Tags, Last Interaction. Cada contacto queda con origen «IMPORTACION» hasta que ManyChat lo actualice.</p>
+    <form method="post" action="/importar" enctype="multipart/form-data" class="filters">
+      <div class="field"><label for="archivo">Archivo</label><input id="archivo" type="file" name="archivo" accept=".csv,.txt" required></div>
+      <div class="field"><label for="ot">Origen a asignar</label><select id="ot" name="origen_tipo">{% for o in ORIGENES %}<option {{ 'selected' if o == 'IMPORTACION' }}>{{ o }}</option>{% endfor %}</select></div>
+      <button type="submit" class="sec">Importar</button>
+    </form>
+  </section>
+</div>
+
+<section class="section block">
+  <h2>Registro de sincronización</h2>
+  {% if logs %}<div class="tbl"><table><tr><th>Cuándo</th><th>Tipo</th><th>Estado</th><th class="num">Items</th><th>Mensaje</th></tr>
+    {% for l in logs %}<tr><td class="muted">{{ l.created_at|dt(false) }}</td><td>{{ l.kind }}</td><td>{% if l.ok %}<span class="ok">ok</span>{% else %}<span class="crit">error</span>{% endif %}</td><td class="num">{{ l.items }}</td><td class="muted">{{ l.message or '' }}</td></tr>{% endfor %}</table></div>
+  {% else %}<p class="empty">Nada todavía. La primera línea aparecerá cuando ManyChat haga el «Test request».</p>{% endif %}
+</section>
+{% endblock %}

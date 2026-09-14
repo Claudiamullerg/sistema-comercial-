@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ app_name }}{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/">Claudia Müller · Sistema Comercial</a>
+  <nav>
+    {% set p = request.url.path %}
+    <a href="/" class="{{ 'on' if p == '/' }}">Panel</a>
+    <a href="/contactos" class="{{ 'on' if p.startswith('/contactos') }}">Contactos</a>
+    <a href="/alertas" class="{{ 'on' if p.startswith('/alertas') }}">Alertas</a>
+    <a href="/contenido" class="{{ 'on' if p.startswith('/contenido') }}">Contenido</a>
+    <a href="/salud" class="{{ 'on' if p.startswith('/salud') }}">Salud</a>
+    <a href="/propuestas" class="{{ 'on' if p.startswith('/propuestas') }}">Propuestas</a>
+    <a href="/configuracion" class="{{ 'on' if p.startswith('/configuracion') }}">Configuración</a>
+  </nav>
+  <span class="badge">{% block badge %}{% endblock %}</span>
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>
