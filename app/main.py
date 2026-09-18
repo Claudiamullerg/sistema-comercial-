@@ -476,6 +476,16 @@ async def webhook_manychat(request: Request, secret: str = "", db: Session = Dep
     except Exception:
         form = await request.form()
         body = dict(form)
+    # Origen por querystring. ManyChat puede mandar "{Full Contact Data}" tal cual
+    # (que no incluye de que flujo viene) y anadir el origen en la URL:
+    #   ...?secret=X&origen_tipo=SEGUIDOR&origen_contenido=seguidor-nuevo
+    # Asi no hace falta ocupar acciones dentro del flujo, que retrasan el envio
+    # del primer mensaje. Lo que venga en el cuerpo siempre manda.
+    if isinstance(body, dict):
+        for campo in ("origen_tipo", "origen_contenido", "keyword", "automatizacion", "cta", "campana"):
+            valor = request.query_params.get(campo)
+            if valor and not body.get(campo):
+                body[campo] = valor
     r = sync.procesar_webhook(db, body)
     db.commit()
     # ManyChat puede mapear estos valores a campos con "Response Mapping"
