@@ -7,7 +7,7 @@ no en ManyChat a mano.
 from __future__ import annotations
 
 # ── DIMENSIÓN 1 · ORIGEN ──────────────────────────────────────────────
-ORIGENES = ["REEL", "HISTORIA", "DM", "COMENTARIO", "LINK", "ANUNCIO", "IMPORTACION", "DESCONOCIDO"]
+ORIGENES = ["REEL", "HISTORIA", "SEGUIDOR", "DM", "COMENTARIO", "LINK", "ANUNCIO", "IMPORTACION", "DESCONOCIDO"]
 
 # ── DIMENSIÓN 2 · INTERÉS ─────────────────────────────────────────────
 INTERESES = ["EXPERIENCIA", "NEGOCIO", "SEGUNDA_ETAPA", "MONETIZACION", "REINVENCION", "OFERTA"]
