@@ -109,6 +109,10 @@ async def _bucle_fondo():
                 if settings.manychat_api_key:
                     sync.refrescar_pendientes(db)
                 audit.correr_auditoria(db)
+              if settings.instagram_refresh_hours > 0 and instagram.InstagramClient().configured:
+                ultimo = db.scalar(select(SyncLog.created_at).where(SyncLog.kind == "instagram").order_by(SyncLog.created_at.desc()))
+                if not ultimo or (datetime.utcnow() - ultimo) >= timedelta(hours=settings.instagram_refresh_hours):
+                  instagram.sincronizar_instagram(db)
         except Exception as e:  # pragma: no cover
             with session_scope() as db:
                 services.log_sync(db, "fondo", False, 0, str(e))
