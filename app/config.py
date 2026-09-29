@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     # Instagram Graph API (opcional, fase 2). Sin token, las métricas se cargan a mano.
     ig_access_token: str = ""
     ig_user_id: str = ""
+    # Cada cuántas horas sincronizar Instagram automáticamente en segundo plano (0 = desactivado)
+    instagram_refresh_hours: int = 24
 
     # Reglas de negocio
     dias_sin_seguimiento: int = 3          # lead sin toque humano en N días → alerta
