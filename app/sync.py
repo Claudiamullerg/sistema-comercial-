@@ -60,9 +60,8 @@ def refrescar_pendientes(db: Session, client: ManyChatClient | None = None, max_
                 n += 1
         except ManyChatError as e:
             errores += 1
-            c.sync_status = "PENDIENTE_DE_SINCRONIZACION"
             log_sync(db, "api_refresh", False, 0, f"{c.display}: {e}")
-            if "429" in str(e):
+            if "429" in str(e) or "integrations ability" in str(e):
                 break
     log_sync(db, "api_refresh", errores == 0, n, f"{n} refrescados, {errores} errores")
     return n
