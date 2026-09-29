@@ -21,7 +21,7 @@ def _o_pendiente(valor, hay_datos: bool):
 
 
 def hay_sync(db: Session) -> bool:
-    return db.scalar(select(func.count(Contact.id)).where(Contact.sync_status == "OK")) > 0
+    return db.scalar(select(func.count(Contact.id)).where(Contact.manychat_id.is_not(None))) > 0
 
 
 def _desde(db: Session, contactos, dias: int) -> dict:
