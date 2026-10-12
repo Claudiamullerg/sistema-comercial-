@@ -146,7 +146,7 @@ def upsert_from_payload(db: Session, p: dict, source: str = "webhook") -> tuple[
     if evento in ("CLICK", "CLIC"):
         c.clicks = (c.clicks or 0) + 1
         log_event(db, c, "click", source=source, payload={"cta": p.get("origen_cta")})
-    if texto and texto != (c.events[0].new_value if c.events and c.events[0].type == "message_in" else None):
+    if texto and texto != c.mc_last_input_text:
         c.interacciones = (c.interacciones or 0) + 1
         c.last_inbound_at = p.get("mc_last_interaction") or datetime.utcnow()
         _set(db, c, "mc_last_input_text", texto, source)
@@ -182,7 +182,11 @@ def clasificar(db: Session, c: Contact, texto: str | None = None, respuesta: str
         _set(db, c, "problema", texto[:300], source)
 
     if texto and etiqueta not in (None, "CURIOSIDAD"):
-        c.needs_reply = True
+        # Solo se marca pendiente si el mensaje entrante es posterior a tu última respuesta:
+        # el refresco de ManyChat relee el mismo último mensaje y no debe volver a levantar la bandera.
+        entrante = c.last_inbound_at or c.mc_last_interaction
+        if not c.last_human_touch or (entrante and entrante > c.last_human_touch):
+            c.needs_reply = True
 
     c.score = classify.calcular_score(c)
     nueva_int = classify.intencion_desde_score(c)
@@ -227,6 +231,10 @@ def _ficha(c: Contact) -> str:
 
 
 def generar_alertas_contacto(db: Session, c: Contact) -> None:
+    # Alertas = tu lista de pendientes: si ya le respondiste, el contacto no vuelve a la lista
+    # hasta que escriba otra vez (eso es lo que levanta needs_reply de nuevo).
+    if not c.needs_reply:
+        return
     if c.intent_label in ("INTENCION_COMPRA", "COMPRADOR") and c.etapa not in ("VENTA", "CLIENTE"):
         crear_alerta(db, "INTENCION_COMPRA", f"INTENCION_COMPRA:{c.id}", f"💰 {c.display} quiere comprar", _ficha(c),
                      "Responder ahora, personalmente. No dejar que la automatización siga.", contact=c)
@@ -248,8 +256,7 @@ def marcar_respondido(db: Session, c: Contact, nota: str | None = None) -> None:
         log_event(db, c, "stage_change", "etapa", c.etapa, "CONVERSACION", "claudia")
         c.etapa = "CONVERSACION"
     log_event(db, c, "message_out", new=nota or "(respondió)", source="claudia")
-    for a in db.scalars(select(Alert).where(Alert.contact_id == c.id, Alert.status == "abierta",
-                                            Alert.type.in_(["LEAD_SIN_SEGUIMIENTO", "PIDIO_INFO"]))):
+    for a in db.scalars(select(Alert).where(Alert.contact_id == c.id, Alert.status == "abierta")):
         a.status, a.resolved_at = "resuelta", datetime.utcnow()
 
 
