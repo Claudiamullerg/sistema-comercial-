@@ -50,6 +50,7 @@ def procesar_hotmart(db: Session, body: dict, hottok_esperado: str | None = None
         return {"ok": True, "contact_id": c.id, "venta": True}
     if evento in EVENTOS_INTENCION:
         c.intent_label = "INTENCION_COMPRA"
+        c.needs_reply = True   # evento nuevo que pide tu acción: debe aparecer en Alertas aunque ya le hubieras respondido
         from .services import clasificar
         clasificar(db, c, source="hotmart")
         agregar_nota(db, c, f"Hotmart: {evento.lower().replace('_', ' ')} ({producto}). Escribirle para cerrar.")
