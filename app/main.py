@@ -268,6 +268,8 @@ def alerta_accion(aid: int, accion: str, db: Session = Depends(get_db), next: st
     a = db.get(Alert, aid)
     if not a:
         raise HTTPException(404)
+    if accion == "resolver" and a.contact:
+        services.marcar_respondido(db, a.contact)   # "Resuelta" = ya le respondí: baja la bandera del contacto
     a.status = "resuelta" if accion == "resolver" else "descartada"
     a.resolved_at = datetime.utcnow()
     db.commit()
